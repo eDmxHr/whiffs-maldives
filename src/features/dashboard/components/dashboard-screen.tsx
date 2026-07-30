@@ -44,24 +44,25 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
               title="Inbox is empty"
               description="The inbox will surface urgent, action-required, and reminder items once orders and payments exist."
               icon={InboxIcon}
+              surface="plain"
             />
           </SectionWrapper>
 
           <div className="grid gap-5 lg:grid-cols-2">
             <SectionWrapper title="Sales chart" description="Revenue and order volume over time.">
-              <EmptyState title="No sales data yet" description="Chart populates once orders start flowing through checkout." icon={Activity01Icon} />
+              <EmptyState title="No sales data yet" description="Chart populates once orders start flowing through checkout." icon={Activity01Icon} surface="plain" />
             </SectionWrapper>
             <SectionWrapper title="Recent orders" description="Latest orders across every status.">
-              <EmptyState title="No orders yet" description="Recent orders will appear here once checkout is implemented." icon={Invoice03Icon} />
+              <EmptyState title="No orders yet" description="Recent orders will appear here once checkout is implemented." icon={Invoice03Icon} surface="plain" />
             </SectionWrapper>
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
             <SectionWrapper title="Packaging inventory health" description="Stock levels for atomizers, boxes, and labels.">
-              <EmptyState title="Not tracked yet" description="Packaging inventory needs the packaging items domain to be built." icon={Package02Icon} />
+              <EmptyState title="Not tracked yet" description="Packaging inventory needs the packaging items domain to be built." icon={Package02Icon} surface="plain" />
             </SectionWrapper>
             <SectionWrapper title="Recent activity" description="Audit trail of admin actions.">
-              <EmptyState title="No activity yet" description="Activity logging will appear here once the audit log table is wired up." icon={Activity01Icon} />
+              <EmptyState title="No activity yet" description="Activity logging will appear here once the audit log table is wired up." icon={Activity01Icon} surface="plain" />
             </SectionWrapper>
           </div>
         </div>

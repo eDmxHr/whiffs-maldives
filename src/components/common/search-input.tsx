@@ -12,7 +12,7 @@ export function SearchInput({ className, ...props }: SearchInputProps) {
     <div className="relative">
       <HugeiconsIcon
         aria-hidden="true"
-        className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+        className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
         icon={Search01Icon}
         strokeWidth={1.5}
       />

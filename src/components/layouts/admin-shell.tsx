@@ -107,10 +107,10 @@ export function AdminShell({ brand, user, actions, children }: AdminShellProps) 
           </div>
         </aside>
 
-        <div className="min-w-0 overflow-hidden rounded-2xl bg-background lg:min-h-[calc(100svh-2.5rem)] lg:rounded-[1.4rem]">
+        <div className="min-w-0 overflow-hidden rounded-2xl lg:min-h-[calc(100svh-2.5rem)] lg:rounded-[1.4rem]">
           <div className="min-h-full">
             {actions ? (
-              <div className="sticky top-0 z-20 flex min-h-14 justify-end bg-background px-4 py-3 md:px-8 lg:hidden">
+              <div className="sticky top-0 z-20 flex min-h-14 justify-end px-4 py-3 md:px-8 lg:hidden">
                 {actions}
               </div>
             ) : null}

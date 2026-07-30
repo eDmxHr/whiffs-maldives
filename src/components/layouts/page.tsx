@@ -14,18 +14,41 @@ type HeadingProps = {
   className?: string
 }
 
-export function Heading({ eyebrow, title, description, icon, actions, size = "section", className }: HeadingProps) {
+export function Heading({
+  eyebrow,
+  title,
+  description,
+  icon,
+  actions,
+  size = "section",
+  className,
+}: HeadingProps) {
   if (size === "page") {
     return (
-      <div className={cn("flex flex-col justify-between gap-5 lg:flex-row lg:items-end", className)}>
+      <div
+        className={cn(
+          "flex flex-col justify-between gap-3 lg:flex-row lg:items-center",
+          className
+        )}
+      >
         <div className="min-w-0">
-          {eyebrow ? <p className="text-xs font-semibold uppercase tracking-[0.24em] text-admin-champagne">{eyebrow}</p> : null}
-          <h1 className="mt-2 font-heading text-3xl font-semibold tracking-normal text-foreground md:text-5xl">{title}</h1>
+          {eyebrow ? (
+            <p className="text-xs font-semibold tracking-[0.24em] text-admin-champagne uppercase">
+              {eyebrow}
+            </p>
+          ) : null}
+          <h1 className="mt-1 font-heading text-2xl font-semibold tracking-normal text-foreground md:text-3xl">
+            {title}
+          </h1>
           {description ? (
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground md:text-[0.95rem]">{description}</p>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              {description}
+            </p>
           ) : null}
         </div>
-        {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+        {actions ? (
+          <div className="flex shrink-0 items-center gap-2">{actions}</div>
+        ) : null}
       </div>
     )
   }
@@ -33,9 +56,24 @@ export function Heading({ eyebrow, title, description, icon, actions, size = "se
   return (
     <div className={cn("flex items-center justify-between gap-3", className)}>
       <div className="min-w-0">
-        {eyebrow ? <p className="text-xs font-semibold uppercase tracking-[0.18em] text-admin-champagne">{eyebrow}</p> : null}
-        <h2 className={cn("text-lg font-semibold text-foreground", eyebrow && "mt-1")}>{title}</h2>
-        {description ? <p className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p> : null}
+        {eyebrow ? (
+          <p className="text-xs font-semibold tracking-[0.18em] text-admin-champagne uppercase">
+            {eyebrow}
+          </p>
+        ) : null}
+        <h2
+          className={cn(
+            "text-lg font-semibold text-foreground",
+            eyebrow && "mt-1"
+          )}
+        >
+          {title}
+        </h2>
+        {description ? (
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            {description}
+          </p>
+        ) : null}
       </div>
       {icon || actions ? (
         <div className="flex shrink-0 items-center gap-2">
@@ -57,21 +95,37 @@ type PageWrapperProps = {
   children: ReactNode
 }
 
-export function PageWrapper({ eyebrow, title, description, actions, meta, breadcrumbs, children }: PageWrapperProps) {
+export function PageWrapper({
+  eyebrow,
+  title,
+  description,
+  actions,
+  meta,
+  breadcrumbs,
+  children,
+}: PageWrapperProps) {
   const hasHeader = Boolean(title || breadcrumbs)
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-full flex-col gap-5">
       {hasHeader ? (
-        <header className="px-4 py-6 md:px-8 md:py-8">
-          <div className="mx-auto flex w-full max-w-360 flex-col gap-4">
+        <header className="px-2 pt-1 md:px-3 md:pt-2">
+          <div className="mx-auto flex w-full max-w-360 flex-col gap-3">
             {breadcrumbs ? <Breadcrumbs items={breadcrumbs} /> : null}
-            {title ? <Heading size="page" eyebrow={eyebrow} title={title} description={description} actions={actions} /> : null}
+            {title ? (
+              <Heading
+                size="page"
+                eyebrow={eyebrow}
+                title={title}
+                description={description}
+                actions={actions}
+              />
+            ) : null}
             {meta}
           </div>
         </header>
       ) : null}
-      <main className="px-4 py-5 md:px-8 md:py-7">
+      <main>
         <div className="mx-auto w-full max-w-360">{children}</div>
       </main>
     </div>
@@ -86,36 +140,57 @@ type SectionWrapperProps = HTMLAttributes<HTMLElement> & {
   headerEyebrow?: string
 }
 
-export function SectionWrapper({ title, description, icon, actions, headerEyebrow, className, children, ...props }: SectionWrapperProps) {
+export function SectionWrapper({
+  title,
+  description,
+  icon,
+  actions,
+  headerEyebrow,
+  className,
+  children,
+  ...props
+}: SectionWrapperProps) {
   return (
-    <section className={cn("rounded-2xl bg-card", className)} {...props}>
+    <section className={cn("flex flex-col rounded-2xl bg-card p-2", className)} {...props}>
       {title ? (
-        <div className="px-5 py-4">
-          <Heading size="section" eyebrow={headerEyebrow} title={title} description={description} icon={icon} actions={actions} />
+        <div className="px-3 pt-2 pb-3">
+          <Heading
+            size="section"
+            eyebrow={headerEyebrow}
+            title={title}
+            description={description}
+            icon={icon}
+            actions={actions}
+          />
         </div>
       ) : null}
-      <div className="p-5">{children}</div>
+      <div className="flex flex-1 flex-col rounded-xl bg-background p-4 md:p-5">{children}</div>
     </section>
   )
 }
 
-export function Toolbar({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+export function Toolbar({
+  className,
+  children,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-3 rounded-2xl bg-card p-3 md:flex-row md:items-center md:justify-between",
-        className
-      )}
-      {...props}
-    />
+    <div className={cn("flex flex-col rounded-2xl bg-card p-2", className)} {...props}>
+      <div className="flex flex-col gap-3 rounded-xl p-2 md:flex-row md:items-center md:justify-between">
+        {children}
+      </div>
+    </div>
   )
 }
 
-export function Inspector({ className, ...props }: HTMLAttributes<HTMLElement>) {
+export function Inspector({
+  className,
+  ...props
+}: HTMLAttributes<HTMLElement>) {
   return (
     <aside
       className={cn(
-        "rounded-2xl bg-card xl:sticky xl:top-7 xl:max-h-[calc(100svh-3.5rem)] xl:overflow-auto",
+        "flex flex-col rounded-2xl bg-card p-2 xl:sticky xl:top-7 xl:max-h-[calc(100svh-3.5rem)] xl:overflow-auto",
         className
       )}
       {...props}

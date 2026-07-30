@@ -28,12 +28,12 @@ export function CustomersScreen({ user }: CustomersScreenProps) {
             />
 
             <Inspector>
-              <div className="px-5 py-4">
+              <div className="px-3 pb-3 pt-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-admin-champagne">Inspector</p>
                 <h2 className="mt-1 text-lg font-semibold">Customer detail</h2>
               </div>
-              <div className="p-5">
-                <EmptyState title="No customer selected" description="Select a customer from the list to review order history and preferences." icon={UserGroup02Icon} />
+              <div className="flex flex-1 flex-col rounded-xl bg-background p-4 md:p-5">
+                <EmptyState title="No customer selected" description="Select a customer from the list to review order history and preferences." icon={UserGroup02Icon} surface="plain" />
               </div>
             </Inspector>
           </div>

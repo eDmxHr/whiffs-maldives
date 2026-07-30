@@ -6,7 +6,15 @@ import { EmptyState } from "@/components/common/empty-state"
 import { SearchInput } from "@/components/common/search-input"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { Inspector, PageWrapper, Toolbar } from "@/components/layouts/page"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const orderStatusItems = [{ label: "All statuses", value: "all" }]
 
@@ -17,10 +25,17 @@ type OrdersScreenProps = {
 export function OrdersScreen({ user }: OrdersScreenProps) {
   return (
     <AdminShell brand="Whiffs Maldives" user={user}>
-      <PageWrapper breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Orders" }]} title="Orders">
+      <PageWrapper
+        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Orders" }]}
+        title="Orders"
+      >
         <div className="grid gap-5">
           <Toolbar>
-            <SearchInput className="min-w-0" placeholder="Search by order number, customer, phone, fragrance, or brand" disabled />
+            <SearchInput
+              className="min-w-0"
+              placeholder="Search by order number, customer, phone, fragrance, or brand"
+              disabled
+            />
             <Select disabled items={orderStatusItems} value="all">
               <SelectTrigger className="md:w-48">
                 <SelectValue placeholder="All statuses" />
@@ -46,12 +61,19 @@ export function OrdersScreen({ user }: OrdersScreenProps) {
             />
 
             <Inspector>
-              <div className="px-5 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-admin-champagne">Inspector</p>
+              <div className="px-3 pb-3 pt-2">
+                <p className="text-xs font-semibold tracking-[0.18em] text-admin-champagne uppercase">
+                  Inspector
+                </p>
                 <h2 className="mt-1 text-lg font-semibold">Order detail</h2>
               </div>
-              <div className="p-5">
-                <EmptyState title="No order selected" description="Select an order from the list to review payment and fulfillment details." icon={Invoice03Icon} />
+              <div className="flex flex-1 flex-col rounded-xl bg-background p-4 md:p-5">
+                <EmptyState
+                  title="No order selected"
+                  description="Select an order from the list to review payment and fulfillment details."
+                  icon={Invoice03Icon}
+                  surface="plain"
+                />
               </div>
             </Inspector>
           </div>
