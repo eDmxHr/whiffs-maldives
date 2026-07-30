@@ -46,7 +46,7 @@ export function OrdersScreen({ user }: OrdersScreenProps) {
             />
 
             <Inspector>
-              <div className="border-b border-border/70 px-5 py-4">
+              <div className="px-5 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-admin-champagne">Inspector</p>
                 <h2 className="mt-1 text-lg font-semibold">Order detail</h2>
               </div>

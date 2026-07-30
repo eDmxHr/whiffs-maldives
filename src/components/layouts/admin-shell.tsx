@@ -48,9 +48,9 @@ export function AdminShell({ brand, user, actions, children }: AdminShellProps) 
   const pathname = usePathname()
 
   return (
-    <div className="min-h-svh bg-background text-foreground">
+    <div className="min-h-svh bg-secondary text-foreground">
       <div className="grid min-h-svh grid-cols-1 gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-5 lg:p-5">
-        <aside className="rounded-2xl bg-sidebar px-5 py-5 text-sidebar-foreground shadow-2xl shadow-admin-reef/18 lg:sticky lg:top-5 lg:h-[calc(100svh-2.5rem)] lg:rounded-[1.4rem]">
+        <aside className="rounded-2xl bg-sidebar px-5 py-5 text-sidebar-foreground lg:sticky lg:top-5 lg:h-[calc(100svh-2.5rem)] lg:rounded-[1.4rem]">
           <div className="flex min-h-full flex-col">
             <div className="font-heading text-2xl font-semibold tracking-normal">{brand}</div>
 
@@ -63,7 +63,7 @@ export function AdminShell({ brand, user, actions, children }: AdminShellProps) 
                     className={cn(
                       "flex h-10 items-center gap-2.5 rounded-lg px-3 font-medium transition-colors duration-150 focus-visible:ring-3 focus-visible:ring-sidebar-ring/45 focus-visible:outline-none",
                       active
-                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                        ? "bg-sidebar-primary text-sidebar-primary-foreground"
                         : "text-sidebar-foreground/72 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                     )}
                     href={item.href}
@@ -77,7 +77,7 @@ export function AdminShell({ brand, user, actions, children }: AdminShellProps) 
 
             <DropdownMenu>
               <DropdownMenuTrigger
-                className="mt-auto flex items-center gap-3 rounded-xl border border-sidebar-border bg-sidebar-accent p-3 text-left transition-colors duration-150 hover:bg-sidebar-accent/80 focus-visible:ring-3 focus-visible:ring-sidebar-ring/45 focus-visible:outline-none"
+                className="mt-auto flex items-center gap-3 rounded-xl bg-sidebar-accent p-3 text-left transition-colors duration-150 hover:bg-sidebar-accent/80 focus-visible:ring-3 focus-visible:ring-sidebar-ring/45 focus-visible:outline-none"
               >
                 <Avatar>
                   <AvatarFallback>{initials(user.name)}</AvatarFallback>
@@ -107,10 +107,10 @@ export function AdminShell({ brand, user, actions, children }: AdminShellProps) 
           </div>
         </aside>
 
-        <div className="min-w-0 overflow-hidden rounded-2xl bg-background/82 ring-1 ring-border/70 backdrop-blur-[1px] lg:min-h-[calc(100svh-2.5rem)] lg:rounded-[1.4rem]">
+        <div className="min-w-0 overflow-hidden rounded-2xl bg-background lg:min-h-[calc(100svh-2.5rem)] lg:rounded-[1.4rem]">
           <div className="min-h-full">
             {actions ? (
-              <div className="sticky top-0 z-20 flex min-h-14 justify-end border-b border-border/70 bg-background/90 px-4 py-3 backdrop-blur md:px-8 lg:hidden">
+              <div className="sticky top-0 z-20 flex min-h-14 justify-end bg-background px-4 py-3 md:px-8 lg:hidden">
                 {actions}
               </div>
             ) : null}

@@ -13,10 +13,10 @@ type EmptyStateProps = {
 
 export function EmptyState({ title, description, icon, action, className }: EmptyStateProps) {
   return (
-    <div className={cn("grid place-items-center rounded-xl border border-dashed border-border bg-muted/30 p-8 text-center", className)}>
+    <div className={cn("grid place-items-center rounded-xl bg-card p-8 text-center", className)}>
       <div className="max-w-sm">
         {icon ? (
-          <div className="mx-auto mb-4 flex size-10 items-center justify-center rounded-lg bg-background text-admin-reef shadow-sm">
+          <div className="mx-auto mb-4 flex size-10 items-center justify-center rounded-lg bg-background text-admin-reef">
             <HugeiconsIcon aria-hidden="true" className="size-5" icon={icon} strokeWidth={1.5} />
           </div>
         ) : null}

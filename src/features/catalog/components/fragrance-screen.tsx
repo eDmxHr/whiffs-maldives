@@ -14,7 +14,6 @@ import { buttonVariants } from "@/components/ui/button"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useFragrances } from "@/features/catalog/hooks/use-catalog"
-import { cn } from "@/lib/utils"
 
 const fragranceStatusConfig: StatusBadgeConfig = {
   draft: {
@@ -121,9 +120,9 @@ export function FragranceScreen({ user }: FragranceScreenProps) {
 
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
             {fragrances.isLoading ? (
-              <div className="rounded-2xl bg-card/92 p-5 ring-1 ring-white/70 text-sm text-muted-foreground">Loading fragrances...</div>
+              <div className="rounded-2xl bg-card p-5 text-sm text-muted-foreground">Loading fragrances...</div>
             ) : visibleFragrances.length ? (
-              <div className="overflow-hidden rounded-2xl bg-card/92 ring-1 ring-white/70">
+              <div className="overflow-hidden rounded-2xl bg-card">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -142,7 +141,7 @@ export function FragranceScreen({ user }: FragranceScreenProps) {
                         <TableRow
                           key={fragrance.id}
                           data-state={selected ? "selected" : undefined}
-                          className={cn("cursor-pointer", selected && "bg-muted/70")}
+                          className="cursor-pointer"
                           role="button"
                           tabIndex={0}
                           onClick={() => setSelectedFragranceId(fragrance.id)}
@@ -176,14 +175,14 @@ export function FragranceScreen({ user }: FragranceScreenProps) {
             )}
 
             <Inspector>
-              <div className="border-b border-border/70 px-5 py-4">
+              <div className="px-5 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-admin-champagne">Inspector</p>
                 <h2 className="mt-1 text-lg font-semibold">Fragrance detail</h2>
               </div>
               <div className="p-5">
                 {selectedFragrance ? (
                   <div className="grid gap-4 text-sm">
-                    <div className="rounded-2xl bg-background/60 p-4 ring-1 ring-white/70">
+                    <div className="rounded-2xl bg-background p-4">
                       <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
                           <div className="font-semibold text-foreground">{selectedFragrance.name}</div>
@@ -194,11 +193,11 @@ export function FragranceScreen({ user }: FragranceScreenProps) {
                     </div>
                     <p className="leading-6 text-muted-foreground">{selectedFragrance.description}</p>
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                      <div className="rounded-2xl bg-background/60 p-4 ring-1 ring-white/70">
+                      <div className="rounded-2xl bg-background p-4">
                         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Images</p>
                         <p className="mt-2 text-xl font-semibold">{selectedFragrance.images.length}</p>
                       </div>
-                      <div className="rounded-2xl bg-background/60 p-4 ring-1 ring-white/70">
+                      <div className="rounded-2xl bg-background p-4">
                         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Offerings</p>
                         <p className="mt-2 text-xl font-semibold">{selectedFragrance.offerings.length}</p>
                       </div>

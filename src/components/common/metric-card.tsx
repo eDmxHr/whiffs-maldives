@@ -21,7 +21,7 @@ const toneClasses = {
 
 export function MetricCard({ label, value, detail, icon, tone = "default", className }: MetricCardProps) {
   return (
-    <Card className={cn("bg-card/90 p-4", className)}>
+    <Card className={cn("bg-card p-4", className)}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
