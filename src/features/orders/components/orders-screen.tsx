@@ -6,7 +6,9 @@ import { EmptyState } from "@/components/common/empty-state"
 import { SearchInput } from "@/components/common/search-input"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { Inspector, PageWrapper, Toolbar } from "@/components/layouts/page"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+const orderStatusItems = [{ label: "All statuses", value: "all" }]
 
 type OrdersScreenProps = {
   user: { name: string; role: string }
@@ -19,12 +21,19 @@ export function OrdersScreen({ user }: OrdersScreenProps) {
         <div className="grid gap-5">
           <Toolbar>
             <SearchInput className="min-w-0" placeholder="Search by order number, customer, phone, fragrance, or brand" disabled />
-            <Select disabled>
+            <Select disabled items={orderStatusItems} value="all">
               <SelectTrigger className="md:w-48">
                 <SelectValue placeholder="All statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All statuses</SelectItem>
+                <SelectGroup>
+                  <SelectLabel>Status</SelectLabel>
+                  {orderStatusItems.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           </Toolbar>

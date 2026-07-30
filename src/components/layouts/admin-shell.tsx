@@ -49,8 +49,8 @@ export function AdminShell({ brand, user, actions, children }: AdminShellProps) 
 
   return (
     <div className="min-h-svh bg-background text-foreground">
-      <div className="grid min-h-svh grid-cols-1 lg:grid-cols-[264px_minmax(0,1fr)]">
-        <aside className="border-b border-sidebar-border bg-sidebar px-5 py-5 text-sidebar-foreground lg:sticky lg:top-0 lg:h-svh lg:border-b-0 lg:border-r">
+      <div className="grid min-h-svh grid-cols-1 gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-5 lg:p-5">
+        <aside className="rounded-2xl bg-sidebar px-5 py-5 text-sidebar-foreground shadow-2xl shadow-admin-reef/18 lg:sticky lg:top-5 lg:h-[calc(100svh-2.5rem)] lg:rounded-[1.4rem]">
           <div className="flex min-h-full flex-col">
             <div className="font-heading text-2xl font-semibold tracking-normal">{brand}</div>
 
@@ -107,8 +107,8 @@ export function AdminShell({ brand, user, actions, children }: AdminShellProps) 
           </div>
         </aside>
 
-        <div className="min-w-0 admin-surface-grid">
-          <div className="min-h-svh bg-background/90 backdrop-blur-[1px]">
+        <div className="min-w-0 overflow-hidden rounded-2xl bg-background/82 ring-1 ring-border/70 backdrop-blur-[1px] lg:min-h-[calc(100svh-2.5rem)] lg:rounded-[1.4rem]">
+          <div className="min-h-full">
             {actions ? (
               <div className="sticky top-0 z-20 flex min-h-14 justify-end border-b border-border/70 bg-background/90 px-4 py-3 backdrop-blur md:px-8 lg:hidden">
                 {actions}

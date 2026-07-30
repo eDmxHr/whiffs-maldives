@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useBottles, useCatalogMutations, useFragrances, useSuppliers } from "@/features/catalog/hooks/use-catalog"
 import { money } from "@/lib/money"
 
@@ -74,6 +74,9 @@ export function BottleScreen({ user }: BottleScreenProps) {
     },
   })
 
+  const fragranceItems =
+    fragrances.data?.map((fragrance) => ({ label: `${fragrance.brand.name} - ${fragrance.name}`, value: fragrance.id })) ?? []
+  const supplierItems = suppliers.data?.map((supplier) => ({ label: supplier.name, value: supplier.id })) ?? []
   const availableBottleCount = bottles.data?.filter((bottle) => bottle.status === "available").length ?? 0
 
   async function submitBottle(values: BottleForm) {
@@ -104,16 +107,19 @@ export function BottleScreen({ user }: BottleScreenProps) {
                   control={bottleForm.control}
                   name="fragranceId"
                   render={({ field }) => (
-                    <Select name={field.name} value={field.value} onValueChange={field.onChange}>
+                    <Select items={fragranceItems} name={field.name} value={field.value || null} onValueChange={(value) => field.onChange(value ?? "")}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select fragrance" />
                       </SelectTrigger>
                       <SelectContent>
-                        {fragrances.data?.map((fragrance) => (
-                          <SelectItem key={fragrance.id} value={fragrance.id}>
-                            {fragrance.brand.name} - {fragrance.name}
-                          </SelectItem>
-                        ))}
+                        <SelectGroup>
+                          <SelectLabel>Fragrances</SelectLabel>
+                          {fragranceItems.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
                       </SelectContent>
                     </Select>
                   )}
@@ -125,16 +131,19 @@ export function BottleScreen({ user }: BottleScreenProps) {
                   control={bottleForm.control}
                   name="supplierId"
                   render={({ field }) => (
-                    <Select name={field.name} value={field.value} onValueChange={field.onChange}>
+                    <Select items={supplierItems} name={field.name} value={field.value || null} onValueChange={(value) => field.onChange(value ?? "")}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select supplier" />
                       </SelectTrigger>
                       <SelectContent>
-                        {suppliers.data?.map((supplier) => (
-                          <SelectItem key={supplier.id} value={supplier.id}>
-                            {supplier.name}
-                          </SelectItem>
-                        ))}
+                        <SelectGroup>
+                          <SelectLabel>Suppliers</SelectLabel>
+                          {supplierItems.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
                       </SelectContent>
                     </Select>
                   )}

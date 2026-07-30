@@ -61,9 +61,9 @@ export function PageWrapper({ eyebrow, title, description, actions, meta, breadc
   const hasHeader = Boolean(title || breadcrumbs)
 
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="flex min-h-full flex-col">
       {hasHeader ? (
-        <header className="border-b border-border/80 px-4 py-6 md:px-8 md:py-8">
+        <header className="border-b border-border/70 bg-card/45 px-4 py-6 backdrop-blur md:px-8 md:py-8">
           <div className="mx-auto flex w-full max-w-360 flex-col gap-4">
             {breadcrumbs ? <Breadcrumbs items={breadcrumbs} /> : null}
             {title ? <Heading size="page" eyebrow={eyebrow} title={title} description={description} actions={actions} /> : null}
@@ -88,7 +88,7 @@ type SectionWrapperProps = HTMLAttributes<HTMLElement> & {
 
 export function SectionWrapper({ title, description, icon, actions, headerEyebrow, className, children, ...props }: SectionWrapperProps) {
   return (
-    <section className={cn("rounded-2xl bg-card/90", className)} {...props}>
+    <section className={cn("rounded-2xl bg-card/92 ring-1 ring-white/70", className)} {...props}>
       {title ? (
         <div className="border-b border-border/70 px-5 py-4">
           <Heading size="section" eyebrow={headerEyebrow} title={title} description={description} icon={icon} actions={actions} />
@@ -103,7 +103,7 @@ export function Toolbar({ className, ...props }: HTMLAttributes<HTMLDivElement>)
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 rounded-xl bg-card/90 p-3 md:flex-row md:items-center md:justify-between",
+        "flex flex-col gap-3 rounded-2xl bg-card/92 p-3 ring-1 ring-white/70 md:flex-row md:items-center md:justify-between",
         className
       )}
       {...props}
@@ -115,7 +115,7 @@ export function Inspector({ className, ...props }: HTMLAttributes<HTMLElement>) 
   return (
     <aside
       className={cn(
-        "rounded-2xl bg-card/90 xl:sticky xl:top-7 xl:max-h-[calc(100svh-3.5rem)] xl:overflow-auto",
+        "rounded-2xl bg-card/92  ring-1 ring-white/70 xl:sticky xl:top-7 xl:max-h-[calc(100svh-3.5rem)] xl:overflow-auto",
         className
       )}
       {...props}
