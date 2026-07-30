@@ -116,7 +116,7 @@ export function FragranceCreateScreen({ user }: FragranceCreateScreenProps) {
         description="Create a draft catalog record and attach it to a brand."
         actions={backAction}
       >
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
           <SectionWrapper
             headerEyebrow="Catalog record"
             title="Fragrance details"

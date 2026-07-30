@@ -118,7 +118,7 @@ export function FragranceScreen({ user }: FragranceScreenProps) {
             </Select>
           </Toolbar>
 
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
             {fragrances.isLoading ? (
               <div className="flex flex-col rounded-2xl bg-card p-2 text-sm text-muted-foreground">
                 <div className="flex flex-1 rounded-xl bg-background p-5">Loading fragrances...</div>

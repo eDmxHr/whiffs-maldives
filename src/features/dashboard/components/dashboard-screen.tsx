@@ -48,7 +48,7 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
             />
           </SectionWrapper>
 
-          <div className="grid gap-5 lg:grid-cols-2">
+          <div className="grid items-start gap-5 lg:grid-cols-2">
             <SectionWrapper title="Sales chart" description="Revenue and order volume over time.">
               <EmptyState title="No sales data yet" description="Chart populates once orders start flowing through checkout." icon={Activity01Icon} surface="plain" />
             </SectionWrapper>
@@ -57,7 +57,7 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
             </SectionWrapper>
           </div>
 
-          <div className="grid gap-5 lg:grid-cols-2">
+          <div className="grid items-start gap-5 lg:grid-cols-2">
             <SectionWrapper title="Packaging inventory health" description="Stock levels for atomizers, boxes, and labels.">
               <EmptyState title="Not tracked yet" description="Packaging inventory needs the packaging items domain to be built." icon={Package02Icon} surface="plain" />
             </SectionWrapper>

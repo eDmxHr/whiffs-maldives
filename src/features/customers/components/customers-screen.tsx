@@ -20,7 +20,7 @@ export function CustomersScreen({ user }: CustomersScreenProps) {
             <SearchInput placeholder="Search by name, phone, or email" disabled />
           </Toolbar>
 
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
             <EmptyState
               title="No customers yet"
               description="Customer records will appear here once checkout captures customer details."

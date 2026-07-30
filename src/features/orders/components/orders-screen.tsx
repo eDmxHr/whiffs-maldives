@@ -53,7 +53,7 @@ export function OrdersScreen({ user }: OrdersScreenProps) {
             </Select>
           </Toolbar>
 
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
             <EmptyState
               title="No orders yet"
               description="Orders will appear here once checkout and payment workflows are implemented."
