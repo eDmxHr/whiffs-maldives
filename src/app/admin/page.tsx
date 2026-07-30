@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 
-import { AdminWorkspace } from "@/features/catalog/components/admin-workspace"
+import { DashboardScreen } from "@/features/dashboard/components/dashboard-screen"
 import { requireAdmin } from "@/lib/auth"
 
 export default async function AdminPage() {
@@ -10,5 +10,5 @@ export default async function AdminPage() {
     redirect("/admin/sign-in")
   }
 
-  return <AdminWorkspace />
+  return <DashboardScreen user={admin} />
 }

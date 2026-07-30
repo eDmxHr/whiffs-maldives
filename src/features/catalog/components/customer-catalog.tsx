@@ -8,10 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useFragrance, useFragrances } from "@/features/catalog/hooks/use-catalog"
-
-function money(value: number) {
-  return `MVR ${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`
-}
+import { money } from "@/lib/money"
 
 export function CustomerCatalog() {
   const fragrances = useFragrances(true)

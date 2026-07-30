@@ -1,4 +1,4 @@
-import { Geist_Mono, Manrope } from "next/font/google"
+import { Manrope } from "next/font/google"
 import localFont from "next/font/local"
 
 import "./globals.css"
@@ -18,11 +18,6 @@ const canela = localFont({
   display: "swap",
 })
 
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-geist-mono",
-})
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,7 +27,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, manrope.variable, canela.variable, "font-sans")}
+      className={cn("antialiased", manrope.variable, canela.variable, "font-sans")}
     >
       <body>
         <ThemeProvider>
