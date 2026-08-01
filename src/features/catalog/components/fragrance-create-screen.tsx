@@ -3,17 +3,16 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Controller, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { ArrowLeft02Icon, PerfumeIcon, PlusSignIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { Inspector, PageWrapper, SectionWrapper } from "@/components/layouts/page"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
+import { FormInput } from "@/components/forms/form-input"
+import { FormSelect } from "@/components/forms/form-select"
+import { FormTextarea } from "@/components/forms/form-textarea"
 import { useBrands, useCatalogMutations } from "@/features/catalog/hooks/use-catalog"
 
 type BrandForm = { name: string; description: string }
@@ -40,10 +39,6 @@ function parseNotes(value: string, pyramidLevel: "top" | "heart" | "base") {
     .map((name) => name.trim())
     .filter(Boolean)
     .map((name, index) => ({ name, category: "", pyramidLevel, position: index + 1 }))
-}
-
-function FieldError({ message }: { message?: string }) {
-  return message ? <p className="text-xs font-medium text-destructive">{message}</p> : null
 }
 
 export function FragranceCreateScreen({ user }: FragranceCreateScreenProps) {
@@ -125,72 +120,44 @@ export function FragranceCreateScreen({ user }: FragranceCreateScreenProps) {
             {notice ? <div className="mb-4 rounded-xl bg-admin-champagne/12 px-4 py-3 text-sm font-medium text-[color-mix(in_oklch,var(--admin-champagne),black_35%)]">{notice}</div> : null}
 
             <form className="grid gap-4" onSubmit={fragranceForm.handleSubmit(submitFragrance)}>
-              <Label>
-                Brand
-                <Controller
-                  control={fragranceForm.control}
-                  name="brandId"
-                  rules={{ required: "Select or create a brand first." }}
-                  render={({ field }) => (
-                    <Select items={brandItems} name={field.name} value={field.value || null} onValueChange={(value) => field.onChange(value ?? "")}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select brand" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Brands</SelectLabel>
-                          {brandItems.map((item) => (
-                            <SelectItem key={item.value} value={item.value}>
-                              {item.label}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                <FieldError message={fragranceForm.formState.errors.brandId?.message} />
-              </Label>
+              <FormSelect
+                control={fragranceForm.control}
+                name="brandId"
+                label="Brand"
+                items={brandItems}
+                placeholder="Select brand"
+                groupLabel="Brands"
+                rules={{ required: "Select or create a brand first." }}
+              />
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Label>
-                  Name
-                  <Input {...fragranceForm.register("name", { required: "Enter a fragrance name." })} />
-                  <FieldError message={fragranceForm.formState.errors.name?.message} />
-                </Label>
-                <Label>
-                  Concentration
-                  <Input {...fragranceForm.register("concentration")} />
-                </Label>
+                <FormInput
+                  control={fragranceForm.control}
+                  name="name"
+                  label="Name"
+                  rules={{ required: "Enter a fragrance name." }}
+                />
+                <FormInput control={fragranceForm.control} name="concentration" label="Concentration" />
               </div>
 
-              <Label>
-                Description
-                <Textarea {...fragranceForm.register("description", { required: "Enter a description.", minLength: { value: 10, message: "Use at least 10 characters." } })} />
-                <FieldError message={fragranceForm.formState.errors.description?.message} />
-              </Label>
+              <FormTextarea
+                control={fragranceForm.control}
+                name="description"
+                label="Description"
+                rules={{ required: "Enter a description.", minLength: { value: 10, message: "Use at least 10 characters." } }}
+              />
 
               <div className="grid gap-4 md:grid-cols-3">
-                <Label>
-                  Perfumer
-                  <Input {...fragranceForm.register("perfumer")} />
-                </Label>
-                <Label>
-                  Gender
-                  <Input {...fragranceForm.register("gender")} />
-                </Label>
-                <Label>
-                  Release year
-                  <Input type="number" {...fragranceForm.register("releaseYear")} />
-                </Label>
+                <FormInput control={fragranceForm.control} name="perfumer" label="Perfumer" />
+                <FormInput control={fragranceForm.control} name="gender" label="Gender" />
+                <FormInput control={fragranceForm.control} name="releaseYear" label="Release year" type="number" />
               </div>
 
-              <Label>
-                Notes
-                <Input placeholder="Top notes, comma separated" {...fragranceForm.register("topNotes")} />
-                <Input placeholder="Heart notes, comma separated" {...fragranceForm.register("heartNotes")} />
-                <Input placeholder="Base notes, comma separated" {...fragranceForm.register("baseNotes")} />
-              </Label>
+              <div className="grid gap-4">
+                <FormInput control={fragranceForm.control} name="topNotes" label="Top notes" placeholder="Comma separated" />
+                <FormInput control={fragranceForm.control} name="heartNotes" label="Heart notes" placeholder="Comma separated" />
+                <FormInput control={fragranceForm.control} name="baseNotes" label="Base notes" placeholder="Comma separated" />
+              </div>
 
               <Button className="w-fit" type="submit" loading={mutations.createFragrance.isPending} loadingText="Creating fragrance...">
                 <HugeiconsIcon aria-hidden="true" data-icon="inline-start" icon={PlusSignIcon} strokeWidth={1.5} />
@@ -206,15 +173,13 @@ export function FragranceCreateScreen({ user }: FragranceCreateScreenProps) {
             </div>
             <div className="flex flex-1 flex-col rounded-xl bg-background p-4 md:p-5">
               <form className="grid gap-4" onSubmit={brandForm.handleSubmit(submitBrand)}>
-                <Label>
-                  Name
-                  <Input {...brandForm.register("name", { required: "Enter a brand name.", minLength: { value: 2, message: "Use at least 2 characters." } })} />
-                  <FieldError message={brandForm.formState.errors.name?.message} />
-                </Label>
-                <Label>
-                  Description
-                  <Textarea {...brandForm.register("description")} />
-                </Label>
+                <FormInput
+                  control={brandForm.control}
+                  name="name"
+                  label="Name"
+                  rules={{ required: "Enter a brand name.", minLength: { value: 2, message: "Use at least 2 characters." } }}
+                />
+                <FormTextarea control={brandForm.control} name="description" label="Description" />
                 <Button type="submit" variant="secondary" loading={mutations.createBrand.isPending} loadingText="Creating brand...">
                   <HugeiconsIcon aria-hidden="true" data-icon="inline-start" icon={PlusSignIcon} strokeWidth={1.5} />
                   Create brand

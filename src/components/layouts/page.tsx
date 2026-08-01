@@ -151,7 +151,10 @@ export function SectionWrapper({
   ...props
 }: SectionWrapperProps) {
   return (
-    <section className={cn("flex flex-col rounded-2xl bg-card p-2", className)} {...props}>
+    <section
+      className={cn("flex flex-col rounded-2xl bg-card p-2", className)}
+      {...props}
+    >
       {title ? (
         <div className="px-3 pt-2 pb-3">
           <Heading
@@ -164,7 +167,9 @@ export function SectionWrapper({
           />
         </div>
       ) : null}
-      <div className="flex flex-1 flex-col rounded-xl bg-background p-4 md:p-5">{children}</div>
+      <div className="flex flex-1 flex-col rounded-xl bg-background p-4 md:p-5">
+        {children}
+      </div>
     </section>
   )
 }
@@ -175,8 +180,11 @@ export function Toolbar({
   ...props
 }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("flex flex-col rounded-2xl bg-card p-2", className)} {...props}>
-      <div className="flex flex-col gap-3 rounded-xl p-2 md:flex-row md:items-center md:justify-between">
+    <div
+      className={cn("flex flex-col rounded-2xl bg-card p-2", className)}
+      {...props}
+    >
+      <div className="flex flex-col gap-3 rounded-xl p-2 md:flex-row md:items-center">
         {children}
       </div>
     </div>

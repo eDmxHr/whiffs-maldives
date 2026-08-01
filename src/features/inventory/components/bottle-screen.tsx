@@ -1,6 +1,6 @@
 "use client"
 
-import { Controller, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { MilkBottleIcon, PlusSignIcon } from "@hugeicons/core-free-icons"
 
@@ -9,9 +9,8 @@ import { AdminShell } from "@/components/layouts/admin-shell"
 import { PageWrapper, SectionWrapper } from "@/components/layouts/page"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { FormInput } from "@/components/forms/form-input"
+import { FormSelect } from "@/components/forms/form-select"
 import { useBottles, useCatalogMutations, useFragrances, useSuppliers } from "@/features/catalog/hooks/use-catalog"
 import { money } from "@/lib/money"
 
@@ -101,74 +100,27 @@ export function BottleScreen({ user }: BottleScreenProps) {
         <div className="grid gap-5">
           <SectionWrapper headerEyebrow="Inventory" title="Bottle intake" icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={MilkBottleIcon} strokeWidth={1.5} />}>
             <form className="grid gap-3 md:grid-cols-3" onSubmit={bottleForm.handleSubmit(submitBottle)}>
-              <Label>
-                Fragrance
-                <Controller
-                  control={bottleForm.control}
-                  name="fragranceId"
-                  render={({ field }) => (
-                    <Select items={fragranceItems} name={field.name} value={field.value || null} onValueChange={(value) => field.onChange(value ?? "")}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select fragrance" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Fragrances</SelectLabel>
-                          {fragranceItems.map((item) => (
-                            <SelectItem key={item.value} value={item.value}>
-                              {item.label}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </Label>
-              <Label>
-                Supplier
-                <Controller
-                  control={bottleForm.control}
-                  name="supplierId"
-                  render={({ field }) => (
-                    <Select items={supplierItems} name={field.name} value={field.value || null} onValueChange={(value) => field.onChange(value ?? "")}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select supplier" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Suppliers</SelectLabel>
-                          {supplierItems.map((item) => (
-                            <SelectItem key={item.value} value={item.value}>
-                              {item.label}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </Label>
-              <Label>
-                Bottle cost
-                <Input type="number" {...bottleForm.register("purchasePrice", { valueAsNumber: true })} />
-              </Label>
-              <Label>
-                Purchase date
-                <Input type="date" {...bottleForm.register("purchaseDate")} />
-              </Label>
-              <Label>
-                Original ml
-                <Input type="number" {...bottleForm.register("originalVolumeMl", { valueAsNumber: true })} />
-              </Label>
-              <Label>
-                Usable ml
-                <Input type="number" {...bottleForm.register("usableVolumeMl", { valueAsNumber: true })} />
-              </Label>
-              <Label>
-                Notes
-                <Input {...bottleForm.register("notes")} />
-              </Label>
+              <FormSelect
+                control={bottleForm.control}
+                name="fragranceId"
+                label="Fragrance"
+                items={fragranceItems}
+                placeholder="Select fragrance"
+                groupLabel="Fragrances"
+              />
+              <FormSelect
+                control={bottleForm.control}
+                name="supplierId"
+                label="Supplier"
+                items={supplierItems}
+                placeholder="Select supplier"
+                groupLabel="Suppliers"
+              />
+              <FormInput control={bottleForm.control} name="purchasePrice" label="Bottle cost" type="number" rules={{ valueAsNumber: true }} />
+              <FormInput control={bottleForm.control} name="purchaseDate" label="Purchase date" type="date" />
+              <FormInput control={bottleForm.control} name="originalVolumeMl" label="Original ml" type="number" rules={{ valueAsNumber: true }} />
+              <FormInput control={bottleForm.control} name="usableVolumeMl" label="Usable ml" type="number" rules={{ valueAsNumber: true }} />
+              <FormInput control={bottleForm.control} name="notes" label="Notes" />
               <Button className="md:col-span-3 md:w-fit" type="submit" loading={mutations.createBottle.isPending} loadingText="Adding bottle...">
                 <HugeiconsIcon aria-hidden="true" data-icon="inline-start" icon={PlusSignIcon} />
                 Add bottle
