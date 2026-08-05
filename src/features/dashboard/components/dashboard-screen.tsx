@@ -47,6 +47,7 @@ import { orderStatusConfig } from "@/features/orders/components/orders-screen"
 import { useOrders } from "@/features/orders/hooks/use-orders"
 import { usePackagingItems } from "@/features/packaging/hooks/use-packaging"
 import { money } from "@/lib/money"
+import { salesByDay as computeSalesByDay, startOfDay } from "@/lib/reports"
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
@@ -60,10 +61,6 @@ const inboxCategoryConfig: StatusBadgeConfig = {
   urgent: { label: "Urgent", variant: "danger" },
   action_required: { label: "Action required", variant: "warning" },
   needs_review: { label: "Needs review", variant: "info" },
-}
-
-function startOfDay(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 }
 
 export function DashboardScreen({ user }: DashboardScreenProps) {
@@ -124,34 +121,7 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
     }
   }, [orders.data])
 
-  const salesByDay = useMemo(() => {
-    const allOrders = orders.data ?? []
-    const days = Array.from({ length: 14 }, (_, index) => {
-      const date = startOfDay(new Date())
-      date.setDate(date.getDate() - (13 - index))
-      return date
-    })
-
-    return days.map((day) => {
-      const nextDay = new Date(day)
-      nextDay.setDate(day.getDate() + 1)
-      const revenue = allOrders
-        .filter((order) => order.paymentStatus === "paid")
-        .filter((order) => {
-          const createdAt = new Date(order.createdAt)
-          return createdAt >= day && createdAt < nextDay
-        })
-        .reduce((sum, order) => sum + order.total, 0)
-
-      return {
-        label: day.toLocaleDateString(undefined, {
-          month: "short",
-          day: "numeric",
-        }),
-        revenue,
-      }
-    })
-  }, [orders.data])
+  const salesByDay = useMemo(() => computeSalesByDay(orders.data ?? [], 14), [orders.data])
 
   const inboxItems = useMemo(() => {
     const items: Array<{
