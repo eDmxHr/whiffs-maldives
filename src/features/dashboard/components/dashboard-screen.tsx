@@ -46,6 +46,7 @@ import {
 import { orderStatusConfig } from "@/features/orders/components/orders-screen"
 import { useOrders } from "@/features/orders/hooks/use-orders"
 import { usePackagingItems } from "@/features/packaging/hooks/use-packaging"
+import { formatDateTime } from "@/lib/datetime"
 import { money } from "@/lib/money"
 import { salesByDay as computeSalesByDay, startOfDay } from "@/lib/reports"
 
@@ -387,7 +388,7 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
                         {orderStatusConfig[order.status]?.label ?? order.status}
                       </span>
                       <span className="text-muted-foreground">
-                        {new Date(order.updatedAt).toLocaleString()}
+                        {formatDateTime(order.updatedAt)}
                       </span>
                     </div>
                   ))}

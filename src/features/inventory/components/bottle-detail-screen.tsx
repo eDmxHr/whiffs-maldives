@@ -36,6 +36,7 @@ import {
   useFragrances,
   useSuppliers,
 } from "@/features/catalog/hooks/use-catalog"
+import { formatDate, formatDateTime } from "@/lib/datetime"
 import { money } from "@/lib/money"
 
 type BottleDetailScreenProps = {
@@ -260,7 +261,7 @@ export function BottleDetailScreen({
                     <div>
                       <p className="text-xs text-muted-foreground">Received</p>
                       <p className="mt-1 text-base font-semibold text-foreground">
-                        {new Date(bottle.data.receivedAt).toLocaleDateString()}
+                        {formatDate(bottle.data.receivedAt)}
                       </p>
                     </div>
                   </div>
@@ -371,7 +372,7 @@ export function BottleDetailScreen({
                       {events.data.map((event) => (
                         <TableRow key={event.id}>
                           <TableCell className="px-4 text-muted-foreground">
-                            {new Date(event.createdAt).toLocaleString()}
+                            {formatDateTime(event.createdAt)}
                           </TableCell>
                           <TableCell>
                             <StatusBadge
