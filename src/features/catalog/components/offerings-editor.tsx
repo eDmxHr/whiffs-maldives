@@ -16,14 +16,23 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useCatalogMutations } from "@/features/catalog/hooks/use-catalog"
+import { useSettings } from "@/features/settings/hooks/use-settings"
 import { money } from "@/lib/money"
-import type { Offering } from "@/types/catalog"
+import { calculateDecantPrice } from "@/lib/pricing"
+import type { Bottle, Offering } from "@/types/catalog"
 
 type OfferingRow = Pick<Offering, "sizeMl" | "price" | "suggestedPrice" | "isActive">
 
 type OfferingsEditorProps = {
   fragranceId: string
   offerings: Offering[]
+  bottles: Bottle[]
+}
+
+function earliestAvailableBottle(bottles: Bottle[]) {
+  return bottles
+    .filter((bottle) => bottle.status === "available" || bottle.status === "low_volume")
+    .sort((a, b) => new Date(a.receivedAt).getTime() - new Date(b.receivedAt).getTime())[0]
 }
 
 function toRows(offerings: Offering[]): OfferingRow[] {
@@ -37,13 +46,44 @@ function toRows(offerings: Offering[]): OfferingRow[] {
     .sort((a, b) => a.sizeMl - b.sizeMl)
 }
 
-export function OfferingsEditor({ fragranceId, offerings }: OfferingsEditorProps) {
+export function OfferingsEditor({ fragranceId, offerings, bottles }: OfferingsEditorProps) {
   const mutations = useCatalogMutations()
+  const settings = useSettings()
   const [rows, setRows] = useState<OfferingRow[]>(() => toRows(offerings))
   const [newSize, setNewSize] = useState("")
   const [newPrice, setNewPrice] = useState("")
   const [error, setError] = useState("")
   const [notice, setNotice] = useState("")
+
+  const suggestionBottle = earliestAvailableBottle(bottles)
+
+  function suggestPrice() {
+    setError("")
+    const sizeMl = Number(newSize)
+
+    if (!sizeMl || sizeMl <= 0) {
+      setError("Enter a size in ml before suggesting a price.")
+      return
+    }
+
+    if (!suggestionBottle || !settings.data) {
+      setError("No available bottle to price this size from yet.")
+      return
+    }
+
+    const result = calculateDecantPrice({
+      bottleCost: suggestionBottle.purchasePrice,
+      usableVolumeMl: suggestionBottle.usableVolumeMl,
+      decantSizeMl: sizeMl,
+      packagingCost: settings.data.packagingCost,
+      operationsBuffer: settings.data.operationsBuffer,
+      grossMargin: settings.data.targetGrossMarginPercent / 100,
+      gstRate: settings.data.gstEnabled ? settings.data.gstRatePercent / 100 : 0,
+      roundingIncrement: settings.data.priceRoundingIncrement,
+    })
+
+    setNewPrice(String(result.finalPrice))
+  }
 
   function addRow() {
     setError("")
@@ -163,6 +203,15 @@ export function OfferingsEditor({ fragranceId, offerings }: OfferingsEditorProps
           Price (MVR)
           <Input type="number" min={0} value={newPrice} onChange={(event) => setNewPrice(event.target.value)} placeholder="180" />
         </Label>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={!suggestionBottle}
+          title={suggestionBottle ? undefined : "No available bottle to price this size from yet."}
+          onClick={suggestPrice}
+        >
+          Suggest price
+        </Button>
         <Button variant="secondary" onClick={addRow}>
           <HugeiconsIcon aria-hidden="true" data-icon="inline-start" icon={PlusSignIcon} strokeWidth={1.5} />
           Add size

@@ -100,7 +100,13 @@ const settings: Settings = {
   lowVolumeThresholdMl: 15,
   orderPaymentExpiryHours: 24,
   firstOrderDiscountPercent: 10,
-  deliveryFeeFlat: 35,
+  deliveryFeeFlat: 0,
+  targetGrossMarginPercent: 40,
+  gstRatePercent: 8,
+  priceRoundingIncrement: 5,
+  packagingCost: 12,
+  operationsBuffer: 5,
+  gstEnabled: false,
 }
 
 const customers: Customer[] = [
@@ -267,8 +273,11 @@ function seedOfferings() {
       bottleCost: bottle.purchasePrice,
       usableVolumeMl: bottle.usableVolumeMl,
       decantSizeMl: sizeMl,
-      packagingCost: 12,
-      operationsBuffer: 5,
+      packagingCost: settings.packagingCost,
+      operationsBuffer: settings.operationsBuffer,
+      grossMargin: settings.targetGrossMarginPercent / 100,
+      gstRate: settings.gstEnabled ? settings.gstRatePercent / 100 : 0,
+      roundingIncrement: settings.priceRoundingIncrement,
     })
 
     return {

@@ -2,15 +2,19 @@
 
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { UserSettings02Icon } from "@hugeicons/core-free-icons"
+import { Calculator01Icon, Settings02Icon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 
 import { LoadingState } from "@/components/common/loading-state"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { PageWrapper, SectionWrapper } from "@/components/layouts/page"
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
 import { FormInput } from "@/components/forms/form-input"
-import { useSettings, useUpdateSettings } from "@/features/settings/hooks/use-settings"
+import {
+  useSettings,
+  useUpdateSettings,
+} from "@/features/settings/hooks/use-settings"
 
 type SettingsForm = {
   wasteAllowancePercent: string
@@ -18,6 +22,11 @@ type SettingsForm = {
   orderPaymentExpiryHours: string
   firstOrderDiscountPercent: string
   deliveryFeeFlat: string
+  targetGrossMarginPercent: string
+  gstRatePercent: string
+  priceRoundingIncrement: string
+  packagingCost: string
+  operationsBuffer: string
 }
 
 type SettingsScreenProps = {
@@ -28,6 +37,7 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
   const settings = useSettings()
   const updateSettings = useUpdateSettings()
   const [notice, setNotice] = useState("")
+  const [gstEnabled, setGstEnabled] = useState(false)
 
   const form = useForm<SettingsForm>({
     defaultValues: {
@@ -36,6 +46,11 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
       orderPaymentExpiryHours: "",
       firstOrderDiscountPercent: "",
       deliveryFeeFlat: "",
+      targetGrossMarginPercent: "",
+      gstRatePercent: "",
+      priceRoundingIncrement: "",
+      packagingCost: "",
+      operationsBuffer: "",
     },
   })
 
@@ -45,9 +60,19 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
         wasteAllowancePercent: String(settings.data.wasteAllowancePercent),
         lowVolumeThresholdMl: String(settings.data.lowVolumeThresholdMl),
         orderPaymentExpiryHours: String(settings.data.orderPaymentExpiryHours),
-        firstOrderDiscountPercent: String(settings.data.firstOrderDiscountPercent),
+        firstOrderDiscountPercent: String(
+          settings.data.firstOrderDiscountPercent
+        ),
         deliveryFeeFlat: String(settings.data.deliveryFeeFlat),
+        targetGrossMarginPercent: String(
+          settings.data.targetGrossMarginPercent
+        ),
+        gstRatePercent: String(settings.data.gstRatePercent),
+        priceRoundingIncrement: String(settings.data.priceRoundingIncrement),
+        packagingCost: String(settings.data.packagingCost),
+        operationsBuffer: String(settings.data.operationsBuffer),
       })
+      setGstEnabled(settings.data.gstEnabled)
     }
   }, [settings.data, form])
 
@@ -59,6 +84,12 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
       orderPaymentExpiryHours: Number(values.orderPaymentExpiryHours),
       firstOrderDiscountPercent: Number(values.firstOrderDiscountPercent),
       deliveryFeeFlat: Number(values.deliveryFeeFlat),
+      targetGrossMarginPercent: Number(values.targetGrossMarginPercent),
+      gstRatePercent: Number(values.gstRatePercent),
+      priceRoundingIncrement: Number(values.priceRoundingIncrement),
+      packagingCost: Number(values.packagingCost),
+      operationsBuffer: Number(values.operationsBuffer),
+      gstEnabled,
     })
     setNotice("Settings saved.")
   }
@@ -66,75 +97,165 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
   return (
     <AdminShell brand="Whiffs Maldives" user={user}>
       <PageWrapper
-        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Settings" }]}
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Settings" },
+        ]}
         title="Settings"
         description="Business-wide defaults used across inventory, pricing, and order workflows."
       >
         <div className="grid gap-5">
-          <SectionWrapper
-            className="max-w-2xl"
-            headerEyebrow="Business settings"
-            title="Operational defaults"
-            icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={UserSettings02Icon} strokeWidth={1.5} />}
-          >
-            {notice ? (
-              <div className="mb-4 rounded-xl bg-admin-champagne/12 px-4 py-3 text-sm font-medium text-[color-mix(in_oklch,var(--admin-champagne),black_35%)]">
-                {notice}
+          {notice ? (
+            <div className="rounded-xl bg-admin-champagne/12 px-4 py-3 text-sm font-medium text-[color-mix(in_oklch,var(--admin-champagne),black_35%)]">
+              {notice}
+            </div>
+          ) : null}
+
+          {settings.isLoading ? (
+            <LoadingState label="Loading settings..." />
+          ) : (
+            <form className="grid gap-5" onSubmit={form.handleSubmit(submit)}>
+              <div className="grid gap-5 xl:grid-cols-2">
+                <SectionWrapper
+                  headerEyebrow="Business settings"
+                  title="Operational defaults"
+                  icon={
+                    <HugeiconsIcon
+                      aria-hidden="true"
+                      className="size-5 text-admin-reef"
+                      icon={Settings02Icon}
+                      strokeWidth={1.5}
+                    />
+                  }
+                >
+                  <div className="grid gap-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <FormInput
+                        control={form.control}
+                        name="wasteAllowancePercent"
+                        label="Waste allowance (%)"
+                        type="number"
+                        rules={{ required: "Enter a waste allowance." }}
+                      />
+                      <FormInput
+                        control={form.control}
+                        name="lowVolumeThresholdMl"
+                        label="Low-volume threshold (ml)"
+                        type="number"
+                        rules={{ required: "Enter a low-volume threshold." }}
+                      />
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <FormInput
+                        control={form.control}
+                        name="orderPaymentExpiryHours"
+                        label="Order payment expiry (hours)"
+                        type="number"
+                        rules={{ required: "Enter a payment expiry window." }}
+                      />
+                      <FormInput
+                        control={form.control}
+                        name="firstOrderDiscountPercent"
+                        label="First-order discount (%)"
+                        type="number"
+                        rules={{ required: "Enter a first-order discount." }}
+                      />
+                    </div>
+
+                    <FormInput
+                      control={form.control}
+                      name="deliveryFeeFlat"
+                      label="Delivery fee (MVR)"
+                      type="number"
+                      rules={{ required: "Enter a delivery fee." }}
+                    />
+                  </div>
+                </SectionWrapper>
+
+                <SectionWrapper
+                  headerEyebrow="Business settings"
+                  title="Pricing formula"
+                  icon={
+                    <HugeiconsIcon
+                      aria-hidden="true"
+                      className="size-5 text-admin-reef"
+                      icon={Calculator01Icon}
+                      strokeWidth={1.5}
+                    />
+                  }
+                >
+                  <div className="grid gap-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <FormInput
+                        control={form.control}
+                        name="targetGrossMarginPercent"
+                        label="Target gross margin (%)"
+                        type="number"
+                        rules={{ required: "Enter a target gross margin." }}
+                      />
+                      <FormInput
+                        control={form.control}
+                        name="priceRoundingIncrement"
+                        label="Price rounding increment (MVR)"
+                        type="number"
+                        rules={{ required: "Enter a rounding increment." }}
+                      />
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <FormInput
+                        control={form.control}
+                        name="packagingCost"
+                        label="Packaging cost (MVR)"
+                        type="number"
+                        rules={{ required: "Enter a packaging cost." }}
+                      />
+                      <FormInput
+                        control={form.control}
+                        name="operationsBuffer"
+                        label="Operations buffer (MVR)"
+                        type="number"
+                        rules={{ required: "Enter an operations buffer." }}
+                      />
+                    </div>
+
+                    <FormInput
+                      control={form.control}
+                      name="gstRatePercent"
+                      label="GST rate (%)"
+                      type="number"
+                      rules={{ required: "Enter a GST rate." }}
+                    />
+
+                    <div className="flex items-center justify-between gap-4 rounded-lg border border-border px-4 py-3">
+                      <div className="grid gap-1">
+                        <p className="text-sm font-medium text-foreground">
+                          Charge GST
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Required only after GST registration.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={gstEnabled}
+                        onCheckedChange={setGstEnabled}
+                      />
+                    </div>
+                  </div>
+                </SectionWrapper>
               </div>
-            ) : null}
 
-            {settings.isLoading ? (
-              <LoadingState label="Loading settings..." surface="plain" />
-            ) : (
-              <form className="grid gap-4" onSubmit={form.handleSubmit(submit)}>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <FormInput
-                    control={form.control}
-                    name="wasteAllowancePercent"
-                    label="Waste allowance (%)"
-                    type="number"
-                    rules={{ required: "Enter a waste allowance." }}
-                  />
-                  <FormInput
-                    control={form.control}
-                    name="lowVolumeThresholdMl"
-                    label="Low-volume threshold (ml)"
-                    type="number"
-                    rules={{ required: "Enter a low-volume threshold." }}
-                  />
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <FormInput
-                    control={form.control}
-                    name="orderPaymentExpiryHours"
-                    label="Order payment expiry (hours)"
-                    type="number"
-                    rules={{ required: "Enter a payment expiry window." }}
-                  />
-                  <FormInput
-                    control={form.control}
-                    name="firstOrderDiscountPercent"
-                    label="First-order discount (%)"
-                    type="number"
-                    rules={{ required: "Enter a first-order discount." }}
-                  />
-                </div>
-
-                <FormInput
-                  control={form.control}
-                  name="deliveryFeeFlat"
-                  label="Delivery fee (MVR)"
-                  type="number"
-                  rules={{ required: "Enter a delivery fee." }}
-                />
-
-                <Button className="w-fit" type="submit" loading={updateSettings.isPending} loadingText="Saving settings...">
-                  Save settings
-                </Button>
-              </form>
-            )}
-          </SectionWrapper>
+              <Button
+                className="w-fit"
+                type="submit"
+                loading={updateSettings.isPending}
+                loadingText="Saving settings..."
+              >
+                Save settings
+              </Button>
+            </form>
+          )}
         </div>
       </PageWrapper>
     </AdminShell>

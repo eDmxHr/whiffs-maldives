@@ -138,7 +138,12 @@ export function FragranceDetailScreen({ user, fragranceId }: FragranceDetailScre
             title="Offerings & pricing"
             icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={PerfumeIcon} strokeWidth={1.5} />}
           >
-            <OfferingsEditor key={fragranceId} fragranceId={fragranceId} offerings={fragrance.data.offerings} />
+            <OfferingsEditor
+              key={fragranceId}
+              fragranceId={fragranceId}
+              offerings={fragrance.data.offerings}
+              bottles={fragrance.data.bottles}
+            />
           </SectionWrapper>
           </div>
         ) : (

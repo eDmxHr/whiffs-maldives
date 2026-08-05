@@ -4,4 +4,10 @@ export interface Settings {
   orderPaymentExpiryHours: number
   firstOrderDiscountPercent: number
   deliveryFeeFlat: number
+  targetGrossMarginPercent: number
+  gstRatePercent: number
+  priceRoundingIncrement: number
+  packagingCost: number
+  operationsBuffer: number
+  gstEnabled: boolean
 }
