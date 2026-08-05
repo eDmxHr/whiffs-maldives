@@ -1,6 +1,9 @@
 import { calculateDecantPrice, DEFAULT_DECANT_SIZES } from "@/lib/pricing"
 import { slugify } from "@/lib/slug"
 import type { Bottle, Brand, Fragrance, FragranceImage, FragranceView, InventoryEvent, Offering, Supplier } from "@/types/catalog"
+import type { Customer, CustomerView } from "@/types/customers"
+import type { Order, OrderStatus } from "@/types/orders"
+import type { Settings } from "@/types/settings"
 
 type CreateBrandInput = Pick<Brand, "name" | "description">
 type CreateFragranceInput = Omit<Fragrance, "id" | "slug" | "status" | "isActive" | "images" | "offerings"> & {
@@ -91,6 +94,169 @@ const inventoryEvents: InventoryEvent[] = [
     createdAt: now(),
   },
 ]
+
+const settings: Settings = {
+  wasteAllowancePercent: 4,
+  lowVolumeThresholdMl: 15,
+  orderPaymentExpiryHours: 24,
+  firstOrderDiscountPercent: 10,
+  deliveryFeeFlat: 35,
+}
+
+const customers: Customer[] = [
+  {
+    id: "customer_aisha",
+    name: "Aisha Rasheed",
+    phone: "+960 771 2345",
+    email: "aisha.rasheed@example.mv",
+    notes: "Prefers Dior fragrances. Usually orders 5ml decants.",
+    createdAt: now(),
+  },
+  {
+    id: "customer_ibrahim",
+    name: "Ibrahim Waheed",
+    phone: "+960 991 8820",
+    email: "ibrahim.waheed@example.mv",
+    notes: "",
+    createdAt: now(),
+  },
+]
+
+const orders: Order[] = [
+  {
+    id: "order_1001",
+    orderNumber: "WM-1001",
+    customerId: "customer_aisha",
+    customerName: "Aisha Rasheed",
+    customerPhone: "+960 771 2345",
+    status: "pending_payment",
+    paymentStatus: "pending",
+    items: [
+      {
+        id: "order_item_1001_1",
+        fragranceName: "Sauvage Eau de Parfum",
+        offeringName: "5ml",
+        sizeMl: 5,
+        quantity: 1,
+        unitPrice: 320,
+        totalPrice: 320,
+      },
+    ],
+    subtotal: 320,
+    deliveryFee: 35,
+    total: 355,
+    deliveryMethod: "Delivery",
+    deliveryAddress: "Male' City, Maafannu",
+    notes: "Awaiting bank transfer proof.",
+    createdAt: now(),
+    updatedAt: now(),
+  },
+  {
+    id: "order_1002",
+    orderNumber: "WM-1002",
+    customerId: "customer_ibrahim",
+    customerName: "Ibrahim Waheed",
+    customerPhone: "+960 991 8820",
+    status: "preparing",
+    paymentStatus: "paid",
+    items: [
+      {
+        id: "order_item_1002_1",
+        fragranceName: "Sauvage Eau de Parfum",
+        offeringName: "10ml",
+        sizeMl: 10,
+        quantity: 2,
+        unitPrice: 560,
+        totalPrice: 1120,
+      },
+    ],
+    subtotal: 1120,
+    deliveryFee: 0,
+    total: 1120,
+    deliveryMethod: "Pickup",
+    deliveryAddress: "",
+    notes: "",
+    createdAt: now(),
+    updatedAt: now(),
+  },
+  {
+    id: "order_1003",
+    orderNumber: "WM-1003",
+    customerId: "customer_aisha",
+    customerName: "Aisha Rasheed",
+    customerPhone: "+960 771 2345",
+    status: "ready",
+    paymentStatus: "paid",
+    items: [
+      {
+        id: "order_item_1003_1",
+        fragranceName: "Sauvage Eau de Parfum",
+        offeringName: "2ml",
+        sizeMl: 2,
+        quantity: 3,
+        unitPrice: 150,
+        totalPrice: 450,
+      },
+    ],
+    subtotal: 450,
+    deliveryFee: 35,
+    total: 485,
+    deliveryMethod: "Delivery",
+    deliveryAddress: "Male' City, Maafannu",
+    notes: "Ready for dispatch.",
+    createdAt: now(),
+    updatedAt: now(),
+  },
+  {
+    id: "order_1004",
+    orderNumber: "WM-1004",
+    customerId: "customer_ibrahim",
+    customerName: "Ibrahim Waheed",
+    customerPhone: "+960 991 8820",
+    status: "completed",
+    paymentStatus: "paid",
+    items: [
+      {
+        id: "order_item_1004_1",
+        fragranceName: "Sauvage Eau de Parfum",
+        offeringName: "5ml",
+        sizeMl: 5,
+        quantity: 1,
+        unitPrice: 320,
+        totalPrice: 320,
+      },
+    ],
+    subtotal: 320,
+    deliveryFee: 0,
+    total: 320,
+    deliveryMethod: "Pickup",
+    deliveryAddress: "",
+    notes: "",
+    createdAt: now(),
+    updatedAt: now(),
+  },
+]
+
+const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  pending_payment: ["payment_confirmed", "cancelled"],
+  payment_confirmed: ["preparing", "cancelled"],
+  preparing: ["ready", "cancelled"],
+  ready: ["completed", "cancelled"],
+  completed: [],
+  cancelled: [],
+}
+
+function toCustomerView(customer: Customer): CustomerView {
+  const customerOrders = orders.filter((order) => order.customerId === customer.id)
+  const lifetimeValue = customerOrders.reduce((sum, order) => sum + order.total, 0)
+
+  return {
+    ...customer,
+    orderCount: customerOrders.length,
+    lifetimeValue,
+    averageOrderValue: customerOrders.length ? lifetimeValue / customerOrders.length : 0,
+  }
+}
 
 function seedOfferings() {
   const fragrance = fragrances[0]
@@ -337,5 +503,51 @@ export const demoStore = {
     })
 
     return { data: bottle }
+  },
+  getSettings() {
+    return settings
+  },
+  updateSettings(input: Partial<Settings>) {
+    Object.assign(settings, input)
+    return settings
+  },
+  listOrders() {
+    return orders
+  },
+  getOrder(orderId: string) {
+    return orders.find((order) => order.id === orderId) ?? null
+  },
+  updateOrderStatus(orderId: string, nextStatus: OrderStatus) {
+    const order = orders.find((item) => item.id === orderId)
+
+    if (!order) {
+      return { error: "NOT_FOUND" as const }
+    }
+
+    if (!ORDER_STATUS_TRANSITIONS[order.status].includes(nextStatus)) {
+      return { error: "INVALID_STATUS_TRANSITION" as const }
+    }
+
+    order.status = nextStatus
+    if (nextStatus === "payment_confirmed") {
+      order.paymentStatus = "paid"
+    }
+    order.updatedAt = now()
+
+    return { data: order }
+  },
+  listCustomers() {
+    return customers.map(toCustomerView)
+  },
+  getCustomer(customerId: string) {
+    const customer = customers.find((item) => item.id === customerId)
+    if (!customer) {
+      return null
+    }
+
+    return {
+      ...toCustomerView(customer),
+      orders: orders.filter((order) => order.customerId === customerId),
+    }
   },
 }

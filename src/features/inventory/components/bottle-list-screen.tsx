@@ -7,6 +7,7 @@ import { MilkBottleIcon, PlusSignIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 
 import { EmptyState } from "@/components/common/empty-state"
+import { LoadingState } from "@/components/common/loading-state"
 import { SearchInput } from "@/components/common/search-input"
 import { StatusBadge, type StatusBadgeConfig } from "@/components/common/status-badge"
 import { AdminShell } from "@/components/layouts/admin-shell"
@@ -141,9 +142,7 @@ export function BottleListScreen({ user }: BottleListScreenProps) {
           </Toolbar>
 
           {bottles.isLoading ? (
-            <div className="flex flex-col rounded-2xl bg-card p-2 text-sm text-muted-foreground">
-              <div className="flex flex-1 rounded-xl bg-background p-5">Loading bottles...</div>
-            </div>
+            <LoadingState label="Loading bottles..." />
           ) : visibleBottles.length ? (
             <div className="flex flex-col rounded-2xl bg-card p-2">
               <div className="flex-1 overflow-hidden rounded-xl bg-background">

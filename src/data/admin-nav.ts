@@ -1,5 +1,12 @@
 import type { IconSvgElement } from "@hugeicons/react"
-import { DashboardSquare01Icon, Invoice03Icon, MilkBottleIcon, PerfumeIcon, UserGroup02Icon } from "@hugeicons/core-free-icons"
+import {
+  DashboardSquare01Icon,
+  Invoice03Icon,
+  MilkBottleIcon,
+  PerfumeIcon,
+  UserGroup02Icon,
+  UserSettings02Icon,
+} from "@hugeicons/core-free-icons"
 
 export type AdminNavItem = {
   label: string
@@ -13,4 +20,5 @@ export const adminNavItems: AdminNavItem[] = [
   { label: "Fragrances", href: "/admin/fragrances", icon: PerfumeIcon },
   { label: "Bottles", href: "/admin/bottles", icon: MilkBottleIcon },
   { label: "Customers", href: "/admin/customers", icon: UserGroup02Icon },
+  { label: "Settings", href: "/admin/settings", icon: UserSettings02Icon },
 ]

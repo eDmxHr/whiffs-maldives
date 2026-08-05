@@ -5,6 +5,7 @@ import { ArrowLeft02Icon, MilkBottleIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 
 import { EmptyState } from "@/components/common/empty-state"
+import { LoadingState } from "@/components/common/loading-state"
 import { StatusBadge } from "@/components/common/status-badge"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { PageWrapper, SectionWrapper } from "@/components/layouts/page"
@@ -46,9 +47,7 @@ export function BottleDetailScreen({ user, bottleId }: BottleDetailScreenProps) 
         actions={backAction}
       >
         {bottle.isLoading ? (
-          <div className="flex flex-col rounded-2xl bg-card p-2 text-sm text-muted-foreground">
-            <div className="flex flex-1 rounded-xl bg-background p-5">Loading bottle...</div>
-          </div>
+          <LoadingState label="Loading bottle..." />
         ) : bottle.data ? (
           <SectionWrapper
             headerEyebrow="Inventory"

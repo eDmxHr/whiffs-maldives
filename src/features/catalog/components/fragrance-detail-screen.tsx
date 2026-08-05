@@ -5,11 +5,13 @@ import { ArrowLeft02Icon, PerfumeIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 
 import { EmptyState } from "@/components/common/empty-state"
+import { LoadingState } from "@/components/common/loading-state"
 import { StatusBadge } from "@/components/common/status-badge"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { PageWrapper, SectionWrapper } from "@/components/layouts/page"
 import { buttonVariants } from "@/components/ui/button"
 import { fragranceStatusConfig } from "@/features/catalog/components/fragrance-screen"
+import { OfferingsEditor } from "@/features/catalog/components/offerings-editor"
 import { useFragrance } from "@/features/catalog/hooks/use-catalog"
 import type { FragranceNote } from "@/types/catalog"
 
@@ -49,15 +51,14 @@ export function FragranceDetailScreen({ user, fragranceId }: FragranceDetailScre
         actions={backAction}
       >
         {fragrance.isLoading ? (
-          <div className="flex flex-col rounded-2xl bg-card p-2 text-sm text-muted-foreground">
-            <div className="flex flex-1 rounded-xl bg-background p-5">Loading fragrance...</div>
-          </div>
+          <LoadingState label="Loading fragrance..." />
         ) : fragrance.data ? (
-          <SectionWrapper
-            headerEyebrow="Catalog"
-            title="Fragrance detail"
-            icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={PerfumeIcon} strokeWidth={1.5} />}
-          >
+          <div className="grid gap-5">
+            <SectionWrapper
+              headerEyebrow="Catalog"
+              title="Fragrance detail"
+              icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={PerfumeIcon} strokeWidth={1.5} />}
+            >
             <div className="divide-y divide-border text-sm">
               <div className="flex items-start justify-between gap-3 pb-4">
                 <div className="min-w-0">
@@ -131,6 +132,15 @@ export function FragranceDetailScreen({ user, fragranceId }: FragranceDetailScre
               ) : null}
             </div>
           </SectionWrapper>
+
+          <SectionWrapper
+            headerEyebrow="Catalog"
+            title="Offerings & pricing"
+            icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={PerfumeIcon} strokeWidth={1.5} />}
+          >
+            <OfferingsEditor key={fragranceId} fragranceId={fragranceId} offerings={fragrance.data.offerings} />
+          </SectionWrapper>
+          </div>
         ) : (
           <EmptyState
             title="Fragrance not found"

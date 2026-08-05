@@ -35,9 +35,9 @@ export function CustomerCatalog() {
             >
               <Card className="overflow-hidden border-[#ddd5c3] bg-[#fbfaf5] transition group-hover:shadow-lg">
               {fragrance.heroImage ? (
-                <img className="aspect-[4/3] w-full object-cover" src={fragrance.heroImage.publicUrl} alt="" />
+                <img className="aspect-4/3 w-full object-cover" src={fragrance.heroImage.publicUrl} alt="" />
               ) : (
-                <div className="aspect-[4/3] bg-[#12352d]" />
+                <div className="aspect-4/3 bg-[#12352d]" />
               )}
               <div className="p-5">
                 <div className="text-sm text-[#7c6a3d]">{fragrance.brand.name}</div>
@@ -77,9 +77,9 @@ export function CustomerFragrance({ slug }: { slug: string }) {
       <section className="mx-auto grid max-w-7xl gap-8 px-5 py-8 md:grid-cols-[1.05fr_0.95fr] md:px-8">
         <div>
           {item.heroImage ? (
-            <img className="aspect-[4/5] w-full rounded-2xl object-cover" src={item.heroImage.publicUrl} alt="" />
+            <img className="aspect-4/5 w-full rounded-2xl object-cover" src={item.heroImage.publicUrl} alt="" />
           ) : (
-            <div className="aspect-[4/5] rounded-2xl bg-[#12352d]" />
+            <div className="aspect-4/5 rounded-2xl bg-[#12352d]" />
           )}
           <div className="mt-3 grid grid-cols-4 gap-3">
             {item.images.map((image) => (

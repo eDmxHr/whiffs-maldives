@@ -11,6 +11,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react"
 
 import { EmptyState } from "@/components/common/empty-state"
+import { LoadingState } from "@/components/common/loading-state"
 import { SearchInput } from "@/components/common/search-input"
 import {
   StatusBadge,
@@ -151,11 +152,7 @@ export function FragranceScreen({ user }: FragranceScreenProps) {
           </Toolbar>
 
           {fragrances.isLoading ? (
-            <div className="flex flex-col rounded-2xl bg-card p-2 text-sm text-muted-foreground">
-              <div className="flex flex-1 rounded-xl bg-background p-5">
-                Loading fragrances...
-              </div>
-            </div>
+            <LoadingState label="Loading fragrances..." />
           ) : visibleFragrances.length ? (
             <div className="flex flex-col rounded-2xl bg-card p-2">
               <div className="flex-1 overflow-hidden rounded-xl bg-background">
