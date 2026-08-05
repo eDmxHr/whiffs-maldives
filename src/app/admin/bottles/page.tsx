@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 
-import { BottleScreen } from "@/features/inventory/components/bottle-screen"
+import { BottleListScreen } from "@/features/inventory/components/bottle-list-screen"
 import { requireAdmin } from "@/lib/auth"
 
 export default async function AdminBottlesPage() {
@@ -10,5 +10,5 @@ export default async function AdminBottlesPage() {
     redirect("/admin/sign-in")
   }
 
-  return <BottleScreen user={admin} />
+  return <BottleListScreen user={admin} />
 }

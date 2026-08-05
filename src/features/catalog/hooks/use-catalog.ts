@@ -9,6 +9,7 @@ import {
   createFragrance,
   createSupplier,
   deleteFragranceImage,
+  getBottle,
   getBottles,
   getBrands,
   getFragrance,
@@ -26,6 +27,7 @@ export const catalogKeys = {
   publishedFragrances: ["fragrances", "published"] as const,
   fragrance: (id: string) => ["fragrances", id] as const,
   bottles: ["bottles"] as const,
+  bottle: (id: string) => ["bottles", id] as const,
   suppliers: ["suppliers"] as const,
 }
 
@@ -46,6 +48,10 @@ export function useFragrance(id: string) {
 
 export function useBottles() {
   return useQuery({ queryKey: catalogKeys.bottles, queryFn: getBottles })
+}
+
+export function useBottle(id: string) {
+  return useQuery({ queryKey: catalogKeys.bottle(id), queryFn: () => getBottle(id), enabled: Boolean(id) })
 }
 
 export function useSuppliers() {

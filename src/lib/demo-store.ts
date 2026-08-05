@@ -309,6 +309,9 @@ export const demoStore = {
   listBottles() {
     return bottles
   },
+  getBottle(bottleId: string) {
+    return bottles.find((bottle) => bottle.id === bottleId) ?? null
+  },
   createBottle(input: CreateBottleInput) {
     if (input.usableVolumeMl > input.originalVolumeMl || input.usableVolumeMl <= 0) {
       return { error: "VALIDATION_ERROR" as const }

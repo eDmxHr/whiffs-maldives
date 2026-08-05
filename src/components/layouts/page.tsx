@@ -110,7 +110,7 @@ export function PageWrapper({
     <div className="flex min-h-full flex-col gap-5">
       {hasHeader ? (
         <header className="px-2 pt-1 md:px-3 md:pt-2">
-          <div className="mx-auto flex w-full max-w-360 flex-col gap-3">
+          <div className="flex w-full flex-col gap-3">
             {breadcrumbs ? <Breadcrumbs items={breadcrumbs} /> : null}
             {title ? (
               <Heading
@@ -126,7 +126,7 @@ export function PageWrapper({
         </header>
       ) : null}
       <main>
-        <div className="mx-auto w-full max-w-360">{children}</div>
+        <div className="w-full">{children}</div>
       </main>
     </div>
   )

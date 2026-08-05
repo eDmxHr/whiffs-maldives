@@ -71,6 +71,11 @@ export async function getBottles() {
   return data.data
 }
 
+export async function getBottle(id: string) {
+  const { data } = await apiClient.get<ApiSuccess<Bottle>>(`/bottles/${id}`)
+  return data.data
+}
+
 export async function createBottle(input: {
   fragranceId: string
   supplierId: string

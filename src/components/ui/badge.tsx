@@ -4,19 +4,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold leading-none",
+  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold leading-none",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground",
-        secondary: "border-transparent bg-secondary text-secondary-foreground",
-        outline: "border-border bg-background text-foreground",
-        luxury: "border-admin-reef/15 bg-admin-reef text-white",
-        neutral: "border-border bg-muted text-muted-foreground",
-        success: "border-admin-success/20 bg-admin-success/12 text-admin-success",
-        warning: "border-admin-warning/25 bg-admin-warning/15 text-[color-mix(in_oklch,var(--admin-warning),black_28%)]",
-        danger: "border-admin-danger/20 bg-admin-danger/12 text-admin-danger",
-        info: "border-admin-info/20 bg-admin-info/12 text-admin-info",
+        default: "bg-primary text-primary-foreground",
+        secondary: "bg-secondary text-secondary-foreground",
+        outline: "bg-background text-foreground",
+        luxury: "bg-admin-reef text-white",
+        neutral: "bg-muted text-muted-foreground",
+        success: "bg-admin-success/12 text-admin-success",
+        warning: "bg-admin-warning/15 text-[color-mix(in_oklch,var(--admin-warning),black_28%)]",
+        danger: "bg-admin-danger/12 text-admin-danger",
+        info: "bg-admin-info/12 text-admin-info",
       },
     },
     defaultVariants: {
