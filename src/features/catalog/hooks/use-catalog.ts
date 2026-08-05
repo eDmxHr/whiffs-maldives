@@ -4,12 +4,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import {
   addFragranceImage,
+  adjustBottle,
+  archiveBottle,
+  archiveFragrance,
   createBottle,
   createBrand,
   createFragrance,
   createSupplier,
   deleteFragranceImage,
   getBottle,
+  getBottleEvents,
   getBottles,
   getBrands,
   getFragrance,
@@ -18,7 +22,10 @@ import {
   publishFragrance,
   reorderFragranceImages,
   saveOfferings,
+  updateBottle,
+  updateFragrance,
 } from "@/features/catalog/api/catalog"
+import type { BottleInput, FragranceInput } from "@/features/catalog/api/catalog"
 import type { Offering } from "@/types/catalog"
 
 export const catalogKeys = {
@@ -28,6 +35,7 @@ export const catalogKeys = {
   fragrance: (id: string) => ["fragrances", id] as const,
   bottles: ["bottles"] as const,
   bottle: (id: string) => ["bottles", id] as const,
+  bottleEvents: (id: string) => ["bottles", id, "events"] as const,
   suppliers: ["suppliers"] as const,
 }
 
@@ -54,6 +62,10 @@ export function useBottle(id: string) {
   return useQuery({ queryKey: catalogKeys.bottle(id), queryFn: () => getBottle(id), enabled: Boolean(id) })
 }
 
+export function useBottleEvents(id: string) {
+  return useQuery({ queryKey: catalogKeys.bottleEvents(id), queryFn: () => getBottleEvents(id), enabled: Boolean(id) })
+}
+
 export function useSuppliers() {
   return useQuery({ queryKey: catalogKeys.suppliers, queryFn: getSuppliers })
 }
@@ -71,6 +83,12 @@ export function useCatalogMutations() {
   return {
     createBrand: useMutation({ mutationFn: createBrand, onSuccess: refreshCatalog }),
     createFragrance: useMutation({ mutationFn: createFragrance, onSuccess: refreshCatalog }),
+    updateFragrance: useMutation({
+      mutationFn: ({ fragranceId, input }: { fragranceId: string; input: Partial<FragranceInput> }) =>
+        updateFragrance(fragranceId, input),
+      onSuccess: refreshCatalog,
+    }),
+    archiveFragrance: useMutation({ mutationFn: archiveFragrance, onSuccess: refreshCatalog }),
     addFragranceImage: useMutation({
       mutationFn: ({ fragranceId, publicUrl }: { fragranceId: string; publicUrl: string }) =>
         addFragranceImage(fragranceId, { publicUrl }),
@@ -98,6 +116,15 @@ export function useCatalogMutations() {
     }),
     publishFragrance: useMutation({ mutationFn: publishFragrance, onSuccess: refreshCatalog }),
     createBottle: useMutation({ mutationFn: createBottle, onSuccess: refreshCatalog }),
+    updateBottle: useMutation({
+      mutationFn: ({ id, input }: { id: string; input: BottleInput }) => updateBottle(id, input),
+      onSuccess: refreshCatalog,
+    }),
+    adjustBottle: useMutation({
+      mutationFn: ({ id, input }: { id: string; input: { quantityMl: number; reason: string } }) => adjustBottle(id, input),
+      onSuccess: refreshCatalog,
+    }),
+    archiveBottle: useMutation({ mutationFn: archiveBottle, onSuccess: refreshCatalog }),
     createSupplier: useMutation({ mutationFn: createSupplier, onSuccess: refreshCatalog }),
   }
 }

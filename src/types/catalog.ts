@@ -76,7 +76,7 @@ export interface Fragrance {
   releaseYear?: number
   perfumer: string
   gender: string
-  status: "draft" | "published"
+  status: "draft" | "published" | "archived"
   isActive: boolean
   images: FragranceImage[]
   notes: FragranceNote[]

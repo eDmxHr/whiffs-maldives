@@ -3,7 +3,9 @@ import { slugify } from "@/lib/slug"
 import type { Bottle, Brand, Fragrance, FragranceImage, FragranceView, InventoryEvent, Offering, Supplier } from "@/types/catalog"
 import type { Customer, CustomerView } from "@/types/customers"
 import type { Order, OrderStatus } from "@/types/orders"
+import type { PackagingItem } from "@/types/packaging"
 import type { Settings } from "@/types/settings"
+import type { AdminUser } from "@/types/users"
 
 type CreateBrandInput = Pick<Brand, "name" | "description">
 type CreateFragranceInput = Omit<Fragrance, "id" | "slug" | "status" | "isActive" | "images" | "offerings"> & {
@@ -109,6 +111,17 @@ const settings: Settings = {
   gstEnabled: false,
 }
 
+const packagingItems: PackagingItem[] = [
+  { id: "packaging_atomizer", name: "5ml atomizer", unit: "piece", unitCost: 8, quantity: 120, minimumQuantity: 30, isActive: true },
+  { id: "packaging_box", name: "Gift box", unit: "piece", unitCost: 15, quantity: 40, minimumQuantity: 20, isActive: true },
+  { id: "packaging_label", name: "Fragrance label", unit: "sheet", unitCost: 2, quantity: 18, minimumQuantity: 25, isActive: true },
+]
+
+const adminUsers: AdminUser[] = [
+  { id: "local-owner", name: "Whiffs Owner", role: "Owner" },
+  { id: "user_aminath", name: "Aminath Shifa", role: "Staff" },
+]
+
 const customers: Customer[] = [
   {
     id: "customer_aisha",
@@ -140,12 +153,15 @@ const orders: Order[] = [
     items: [
       {
         id: "order_item_1001_1",
+        fragranceId: "fragrance_sauvage",
+        offeringId: "offering_5ml",
         fragranceName: "Sauvage Eau de Parfum",
         offeringName: "5ml",
         sizeMl: 5,
         quantity: 1,
         unitPrice: 320,
         totalPrice: 320,
+        fulfilledQuantity: 0,
       },
     ],
     subtotal: 320,
@@ -154,6 +170,8 @@ const orders: Order[] = [
     deliveryMethod: "Delivery",
     deliveryAddress: "Male' City, Maafannu",
     notes: "Awaiting bank transfer proof.",
+    paymentProofUrl: "",
+    fulfillmentChecklist: defaultChecklist(),
     createdAt: now(),
     updatedAt: now(),
   },
@@ -168,12 +186,15 @@ const orders: Order[] = [
     items: [
       {
         id: "order_item_1002_1",
+        fragranceId: "fragrance_sauvage",
+        offeringId: "offering_10ml",
         fragranceName: "Sauvage Eau de Parfum",
         offeringName: "10ml",
         sizeMl: 10,
         quantity: 2,
         unitPrice: 560,
         totalPrice: 1120,
+        fulfilledQuantity: 0,
       },
     ],
     subtotal: 1120,
@@ -182,6 +203,8 @@ const orders: Order[] = [
     deliveryMethod: "Pickup",
     deliveryAddress: "",
     notes: "",
+    paymentProofUrl: "",
+    fulfillmentChecklist: defaultChecklist(["collect"]),
     createdAt: now(),
     updatedAt: now(),
   },
@@ -196,12 +219,15 @@ const orders: Order[] = [
     items: [
       {
         id: "order_item_1003_1",
+        fragranceId: "fragrance_sauvage",
+        offeringId: "offering_2ml",
         fragranceName: "Sauvage Eau de Parfum",
         offeringName: "2ml",
         sizeMl: 2,
         quantity: 3,
         unitPrice: 150,
         totalPrice: 450,
+        fulfilledQuantity: 3,
       },
     ],
     subtotal: 450,
@@ -210,6 +236,8 @@ const orders: Order[] = [
     deliveryMethod: "Delivery",
     deliveryAddress: "Male' City, Maafannu",
     notes: "Ready for dispatch.",
+    paymentProofUrl: "",
+    fulfillmentChecklist: defaultChecklist(["collect", "fill", "quality", "package"]),
     createdAt: now(),
     updatedAt: now(),
   },
@@ -224,12 +252,15 @@ const orders: Order[] = [
     items: [
       {
         id: "order_item_1004_1",
+        fragranceId: "fragrance_sauvage",
+        offeringId: "offering_5ml",
         fragranceName: "Sauvage Eau de Parfum",
         offeringName: "5ml",
         sizeMl: 5,
         quantity: 1,
         unitPrice: 320,
         totalPrice: 320,
+        fulfilledQuantity: 1,
       },
     ],
     subtotal: 320,
@@ -238,6 +269,8 @@ const orders: Order[] = [
     deliveryMethod: "Pickup",
     deliveryAddress: "",
     notes: "",
+    paymentProofUrl: "",
+    fulfillmentChecklist: defaultChecklist(["collect", "fill", "quality", "package"]),
     createdAt: now(),
     updatedAt: now(),
   },
@@ -262,6 +295,27 @@ function toCustomerView(customer: Customer): CustomerView {
     lifetimeValue,
     averageOrderValue: customerOrders.length ? lifetimeValue / customerOrders.length : 0,
   }
+}
+
+function defaultChecklist(doneIds: string[] = []): FulfillmentChecklistItem[] {
+  return [
+    { id: "collect", label: "Collect atomizers and packaging materials" },
+    { id: "fill", label: "Fill decants" },
+    { id: "quality", label: "Quality check" },
+    { id: "package", label: "Package order" },
+  ].map((step) => ({ ...step, done: doneIds.includes(step.id) }))
+}
+
+function computeBottleStatus(remainingVolumeMl: number): Bottle["status"] {
+  if (remainingVolumeMl <= 0) {
+    return "empty"
+  }
+
+  if (remainingVolumeMl <= settings.lowVolumeThresholdMl) {
+    return "low_volume"
+  }
+
+  return "available"
 }
 
 function seedOfferings() {
@@ -469,6 +523,16 @@ export const demoStore = {
     fragrance.status = "published"
     return { data: toView(fragrance) }
   },
+  archiveFragrance(fragranceId: string) {
+    const fragrance = fragrances.find((item) => item.id === fragranceId)
+
+    if (!fragrance) {
+      return null
+    }
+
+    fragrance.status = "archived"
+    return toView(fragrance)
+  },
   listSuppliers() {
     return suppliers
   },
@@ -513,6 +577,63 @@ export const demoStore = {
 
     return { data: bottle }
   },
+  updateBottle(bottleId: string, input: CreateBottleInput) {
+    const bottle = bottles.find((item) => item.id === bottleId)
+
+    if (!bottle) {
+      return null
+    }
+
+    if (input.usableVolumeMl > input.originalVolumeMl || input.usableVolumeMl <= 0) {
+      return { error: "VALIDATION_ERROR" as const }
+    }
+
+    Object.assign(bottle, input)
+    bottle.remainingVolumeMl = Math.min(bottle.remainingVolumeMl, bottle.usableVolumeMl)
+    bottle.status = computeBottleStatus(bottle.remainingVolumeMl)
+
+    return { data: bottle }
+  },
+  adjustBottle(bottleId: string, input: { quantityMl: number; reason: string }) {
+    const bottle = bottles.find((item) => item.id === bottleId)
+
+    if (!bottle) {
+      return { error: "NOT_FOUND" as const }
+    }
+
+    const balanceAfterMl = Math.max(0, Math.min(bottle.usableVolumeMl, bottle.remainingVolumeMl + input.quantityMl))
+
+    bottle.remainingVolumeMl = balanceAfterMl
+    bottle.status = computeBottleStatus(balanceAfterMl)
+
+    const event: InventoryEvent = {
+      id: id("event"),
+      bottleId,
+      type: "adjustment",
+      quantityMl: input.quantityMl,
+      balanceAfterMl,
+      reason: input.reason,
+      createdAt: now(),
+    }
+    inventoryEvents.unshift(event)
+
+    return { data: bottle }
+  },
+  archiveBottle(bottleId: string) {
+    const bottle = bottles.find((item) => item.id === bottleId)
+
+    if (!bottle) {
+      return null
+    }
+
+    bottle.status = "archived"
+    return bottle
+  },
+  listInventoryEvents(bottleId: string) {
+    return inventoryEvents
+      .filter((event) => event.bottleId === bottleId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  },
   getSettings() {
     return settings
   },
@@ -545,6 +666,59 @@ export const demoStore = {
 
     return { data: order }
   },
+  setOrderPaymentProof(orderId: string, publicUrl: string) {
+    const order = orders.find((item) => item.id === orderId)
+
+    if (!order) {
+      return null
+    }
+
+    order.paymentProofUrl = publicUrl
+    order.updatedAt = now()
+    return order
+  },
+  toggleOrderChecklistItem(orderId: string, checklistItemId: string) {
+    const order = orders.find((item) => item.id === orderId)
+
+    if (!order) {
+      return null
+    }
+
+    const checklistItem = order.fulfillmentChecklist.find((item) => item.id === checklistItemId)
+
+    if (!checklistItem) {
+      return null
+    }
+
+    checklistItem.done = !checklistItem.done
+    order.updatedAt = now()
+    return order
+  },
+  recordPartialFulfillment(orderId: string, orderItemId: string, fulfilledQuantity: number) {
+    const order = orders.find((item) => item.id === orderId)
+
+    if (!order) {
+      return { error: "NOT_FOUND" as const }
+    }
+
+    const orderItem = order.items.find((item) => item.id === orderItemId)
+
+    if (!orderItem) {
+      return { error: "NOT_FOUND" as const }
+    }
+
+    if (fulfilledQuantity < 0 || fulfilledQuantity > orderItem.quantity) {
+      return { error: "VALIDATION_ERROR" as const }
+    }
+
+    orderItem.fulfilledQuantity = fulfilledQuantity
+    orderItem.totalPrice = orderItem.unitPrice * fulfilledQuantity
+    order.subtotal = order.items.reduce((sum, item) => sum + item.totalPrice, 0)
+    order.total = order.subtotal + order.deliveryFee
+    order.updatedAt = now()
+
+    return { data: order }
+  },
   listCustomers() {
     return customers.map(toCustomerView)
   },
@@ -558,5 +732,40 @@ export const demoStore = {
       ...toCustomerView(customer),
       orders: orders.filter((order) => order.customerId === customerId),
     }
+  },
+  listPackagingItems() {
+    return packagingItems
+  },
+  createPackagingItem(input: Omit<PackagingItem, "id" | "isActive">) {
+    const item: PackagingItem = {
+      id: id("packaging"),
+      ...input,
+      isActive: true,
+    }
+    packagingItems.unshift(item)
+    return item
+  },
+  updatePackagingItem(itemId: string, input: Partial<Omit<PackagingItem, "id">>) {
+    const item = packagingItems.find((entry) => entry.id === itemId)
+
+    if (!item) {
+      return null
+    }
+
+    Object.assign(item, input)
+    return item
+  },
+  listUsers() {
+    return adminUsers
+  },
+  updateUserRole(userId: string, role: AdminUser["role"]) {
+    const user = adminUsers.find((item) => item.id === userId)
+
+    if (!user) {
+      return null
+    }
+
+    user.role = role
+    return user
   },
 }

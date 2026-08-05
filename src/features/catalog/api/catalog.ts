@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/api-client"
 import type { ApiCollection, ApiSuccess } from "@/types/api"
-import type { Bottle, Brand, FragranceView, Offering, Supplier } from "@/types/catalog"
+import type { Bottle, Brand, FragranceImage, FragranceView, InventoryEvent, Offering, Supplier } from "@/types/catalog"
 
 export async function getBrands() {
   const { data } = await apiClient.get<ApiCollection<Brand>>("/brands")
@@ -24,7 +24,7 @@ export async function getFragrance(idOrSlug: string) {
   return data.data
 }
 
-export async function createFragrance(input: {
+export type FragranceInput = {
   brandId: string
   name: string
   description: string
@@ -33,18 +33,30 @@ export async function createFragrance(input: {
   perfumer: string
   gender: string
   notes: Array<{ name: string; category: string; pyramidLevel: "top" | "heart" | "base"; position: number }>
-}) {
+}
+
+export async function createFragrance(input: FragranceInput) {
   const { data } = await apiClient.post<ApiSuccess<FragranceView>>("/fragrances", input)
   return data.data
 }
 
+export async function updateFragrance(fragranceId: string, input: Partial<FragranceInput>) {
+  const { data } = await apiClient.patch<ApiSuccess<FragranceView>>(`/fragrances/${fragranceId}`, input)
+  return data.data
+}
+
+export async function archiveFragrance(fragranceId: string) {
+  const { data } = await apiClient.post<ApiSuccess<FragranceView>>(`/fragrances/${fragranceId}/archive`)
+  return data.data
+}
+
 export async function addFragranceImage(fragranceId: string, input: { publicUrl: string }) {
-  const { data } = await apiClient.post<ApiSuccess<unknown>>(`/fragrances/${fragranceId}/images`, input)
+  const { data } = await apiClient.post<ApiSuccess<FragranceImage>>(`/fragrances/${fragranceId}/images`, input)
   return data.data
 }
 
 export async function reorderFragranceImages(fragranceId: string, imageIds: string[]) {
-  const { data } = await apiClient.patch<ApiCollection<unknown>>(`/fragrances/${fragranceId}/images/reorder`, { imageIds })
+  const { data } = await apiClient.patch<ApiCollection<FragranceImage>>(`/fragrances/${fragranceId}/images/reorder`, { imageIds })
   return data.data
 }
 
@@ -76,7 +88,7 @@ export async function getBottle(id: string) {
   return data.data
 }
 
-export async function createBottle(input: {
+export type BottleInput = {
   fragranceId: string
   supplierId: string
   originalVolumeMl: number
@@ -84,8 +96,30 @@ export async function createBottle(input: {
   purchasePrice: number
   purchaseDate: string
   notes: string
-}) {
+}
+
+export async function createBottle(input: BottleInput) {
   const { data } = await apiClient.post<ApiSuccess<Bottle>>("/bottles", input)
+  return data.data
+}
+
+export async function updateBottle(id: string, input: BottleInput) {
+  const { data } = await apiClient.patch<ApiSuccess<Bottle>>(`/bottles/${id}`, input)
+  return data.data
+}
+
+export async function adjustBottle(id: string, input: { quantityMl: number; reason: string }) {
+  const { data } = await apiClient.post<ApiSuccess<Bottle>>(`/bottles/${id}/adjustments`, input)
+  return data.data
+}
+
+export async function archiveBottle(id: string) {
+  const { data } = await apiClient.post<ApiSuccess<Bottle>>(`/bottles/${id}/archive`)
+  return data.data
+}
+
+export async function getBottleEvents(id: string) {
+  const { data } = await apiClient.get<ApiCollection<InventoryEvent>>(`/bottles/${id}/events`)
   return data.data
 }
 

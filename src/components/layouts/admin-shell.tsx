@@ -1,10 +1,13 @@
 "use client"
 
-import type { ReactNode } from "react"
+import type { MouseEvent, ReactNode } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Logout01Icon, UnfoldMoreIcon, UserSettings02Icon } from "@hugeicons/core-free-icons"
+
+import { isSupabaseConfigured } from "@/lib/env"
+import { createClient } from "@/lib/supabase/browser"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -46,6 +49,18 @@ function initials(name: string) {
 
 export function AdminShell({ brand, user, actions, children }: AdminShellProps) {
   const pathname = usePathname()
+  const router = useRouter()
+
+  async function handleSignOut(event: MouseEvent) {
+    if (!isSupabaseConfigured()) {
+      return
+    }
+
+    event.preventDefault()
+    await createClient().auth.signOut()
+    router.push("/admin/sign-in")
+    router.refresh()
+  }
 
   return (
     <div className="min-h-svh bg-secondary text-foreground">
@@ -98,7 +113,11 @@ export function AdminShell({ brand, user, actions, children }: AdminShellProps) 
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" render={<Link href="/admin/sign-in" />}>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={handleSignOut}
+                  render={<Link href="/admin/sign-in" />}
+                >
                   <HugeiconsIcon aria-hidden="true" icon={Logout01Icon} strokeWidth={1.5} />
                   Sign out
                 </DropdownMenuItem>

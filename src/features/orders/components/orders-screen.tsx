@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useForm } from "react-hook-form"
 import { Cancel01Icon, CheckmarkCircle02Icon, Invoice03Icon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 
@@ -11,6 +12,8 @@ import { StatusBadge, type StatusBadgeConfig } from "@/components/common/status-
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { Inspector, PageWrapper, Toolbar } from "@/components/layouts/page"
 import { Button } from "@/components/ui/button"
+import { FormUpload } from "@/components/forms/form-upload"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -28,7 +31,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { toast } from "@/components/ui/toast"
+import { useBottles } from "@/features/catalog/hooks/use-catalog"
 import { useOrderMutations, useOrders } from "@/features/orders/hooks/use-orders"
+import { earliestAvailableBottle } from "@/lib/inventory"
+import { readFileAsDataUrl } from "@/lib/files"
 import { money } from "@/lib/money"
 import type { Order, OrderStatus } from "@/types/orders"
 
@@ -81,6 +88,12 @@ const ORDER_ACTIONS: Record<OrderStatus, Array<{ label: string; nextStatus: Orde
   cancelled: [],
 }
 
+type ProofUploadForm = { file: File | null }
+
+function mutationErrorMessage(error: unknown, fallback: string) {
+  return error && typeof error === "object" && "message" in error ? String((error as { message: unknown }).message) : fallback
+}
+
 type OrdersScreenProps = {
   user: { name: string; role: string }
 }
@@ -89,8 +102,12 @@ export function OrdersScreen({ user }: OrdersScreenProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
+  const [error, setError] = useState("")
+  const [fulfillDrafts, setFulfillDrafts] = useState<Record<string, string>>({})
   const orders = useOrders()
+  const bottles = useBottles()
   const mutations = useOrderMutations()
+  const proofForm = useForm<ProofUploadForm>({ defaultValues: { file: null } })
 
   const visibleOrders = useMemo(() => {
     const query = searchQuery.trim().toLowerCase()
@@ -107,6 +124,51 @@ export function OrdersScreen({ user }: OrdersScreenProps) {
   }, [orders.data, searchQuery, statusFilter])
 
   const selectedOrder: Order | undefined = orders.data?.find((order) => order.id === selectedOrderId)
+
+  async function submitProof(values: ProofUploadForm) {
+    if (!selectedOrder || !values.file) {
+      setError("Choose an image of the payment proof first.")
+      return
+    }
+
+    setError("")
+
+    try {
+      const publicUrl = await readFileAsDataUrl(values.file)
+      await mutations.setPaymentProof.mutateAsync({ id: selectedOrder.id, publicUrl })
+      proofForm.reset({ file: null })
+      toast.add({ title: "Payment proof attached.", type: "success" })
+    } catch (uploadError) {
+      setError(mutationErrorMessage(uploadError, "Could not attach payment proof."))
+    }
+  }
+
+  async function toggleChecklistItem(orderId: string, checklistItemId: string) {
+    setError("")
+    try {
+      await mutations.toggleChecklistItem.mutateAsync({ id: orderId, checklistItemId })
+    } catch (mutationError) {
+      setError(mutationErrorMessage(mutationError, "Could not update the checklist."))
+    }
+  }
+
+  async function recordFulfillment(orderId: string, itemId: string) {
+    setError("")
+    const draft = fulfillDrafts[itemId]
+    const fulfilledQuantity = Number(draft)
+
+    if (draft === undefined || Number.isNaN(fulfilledQuantity)) {
+      setError("Enter a fulfilled quantity.")
+      return
+    }
+
+    try {
+      await mutations.recordPartialFulfillment.mutateAsync({ id: orderId, itemId, fulfilledQuantity })
+      toast.add({ title: "Fulfillment recorded.", type: "success" })
+    } catch (mutationError) {
+      setError(mutationErrorMessage(mutationError, "Could not record fulfillment."))
+    }
+  }
 
   return (
     <AdminShell brand="Whiffs Maldives" user={user}>
@@ -142,6 +204,10 @@ export function OrdersScreen({ user }: OrdersScreenProps) {
               </SelectContent>
             </Select>
           </Toolbar>
+
+          {error ? (
+            <div className="rounded-xl bg-admin-danger/12 px-4 py-3 text-sm font-medium text-admin-danger">{error}</div>
+          ) : null}
 
           <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
             {orders.isLoading ? (
@@ -222,15 +288,118 @@ export function OrdersScreen({ user }: OrdersScreenProps) {
 
                     <div className="py-4">
                       <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">Items</p>
-                      <div className="mt-3 grid gap-2">
+                      <div className="mt-3 grid gap-3">
                         {selectedOrder.items.map((item) => (
-                          <div key={item.id} className="flex items-center justify-between gap-3">
-                            <span className="text-foreground">
-                              {item.fragranceName} · {item.offeringName} × {item.quantity}
-                            </span>
-                            <span className="text-muted-foreground">{money(item.totalPrice)}</span>
+                          <div key={item.id} className="grid gap-1.5">
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-foreground">
+                                {item.fragranceName} · {item.offeringName} × {item.quantity}
+                              </span>
+                              <span className="text-muted-foreground">{money(item.totalPrice)}</span>
+                            </div>
+                            <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+                              <span>
+                                Fulfilled {item.fulfilledQuantity}/{item.quantity}
+                              </span>
+                              {selectedOrder.status === "preparing" ? (
+                                <div className="flex items-center gap-2">
+                                  <Input
+                                    className="h-8 w-16"
+                                    type="number"
+                                    min={0}
+                                    max={item.quantity}
+                                    placeholder={String(item.fulfilledQuantity)}
+                                    value={fulfillDrafts[item.id] ?? ""}
+                                    onChange={(event) =>
+                                      setFulfillDrafts((current) => ({ ...current, [item.id]: event.target.value }))
+                                    }
+                                  />
+                                  <Button
+                                    size="xs"
+                                    variant="outline"
+                                    loading={mutations.recordPartialFulfillment.isPending}
+                                    onClick={() => recordFulfillment(selectedOrder.id, item.id)}
+                                  >
+                                    Update
+                                  </Button>
+                                </div>
+                              ) : null}
+                            </div>
                           </div>
                         ))}
+                      </div>
+                    </div>
+
+                    {selectedOrder.status === "payment_confirmed" || selectedOrder.status === "preparing" ? (
+                      <div className="py-4">
+                        <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+                          Bottle allocation preview
+                        </p>
+                        <div className="mt-3 grid gap-2">
+                          {selectedOrder.items.map((item) => {
+                            const bottle = earliestAvailableBottle(bottles.data ?? [], item.fragranceId)
+                            return (
+                              <div key={item.id} className="flex items-center justify-between gap-3">
+                                <span className="text-foreground">{item.offeringName}</span>
+                                <span className="text-muted-foreground">
+                                  {bottle
+                                    ? `Bottle ${bottle.id.slice(-4)} · ${bottle.remainingVolumeMl}ml left`
+                                    : "No bottle available"}
+                                </span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {selectedOrder.status === "preparing" || selectedOrder.status === "ready" || selectedOrder.status === "completed" ? (
+                      <div className="py-4">
+                        <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+                          Fulfillment checklist
+                        </p>
+                        <div className="mt-3 grid gap-2">
+                          {selectedOrder.fulfillmentChecklist.map((checklistItem) => (
+                            <Button
+                              key={checklistItem.id}
+                              type="button"
+                              size="sm"
+                              variant={checklistItem.done ? "secondary" : "outline"}
+                              className="justify-start"
+                              onClick={() => toggleChecklistItem(selectedOrder.id, checklistItem.id)}
+                            >
+                              <HugeiconsIcon
+                                aria-hidden="true"
+                                data-icon="inline-start"
+                                icon={CheckmarkCircle02Icon}
+                                strokeWidth={1.5}
+                              />
+                              {checklistItem.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    <div className="py-4">
+                      <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">Payment proof</p>
+                      <div className="mt-3 grid gap-3">
+                        {selectedOrder.paymentProofUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            alt="Payment proof"
+                            src={selectedOrder.paymentProofUrl}
+                            className="h-32 w-full rounded-lg border border-border object-cover"
+                          />
+                        ) : (
+                          <p className="text-muted-foreground">No proof attached yet.</p>
+                        )}
+                        <form className="flex items-end gap-2" onSubmit={proofForm.handleSubmit(submitProof)}>
+                          <FormUpload control={proofForm.control} name="file" label="Attach proof" accept="image/*" />
+                          <Button size="sm" type="submit" loading={mutations.setPaymentProof.isPending} loadingText="Uploading...">
+                            Upload
+                          </Button>
+                        </form>
                       </div>
                     </div>
 

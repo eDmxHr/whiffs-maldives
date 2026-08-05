@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -10,6 +9,7 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { Inspector, PageWrapper, SectionWrapper } from "@/components/layouts/page"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { toast } from "@/components/ui/toast"
 import { FormInput } from "@/components/forms/form-input"
 import { FormSelect } from "@/components/forms/form-select"
 import { FormTextarea } from "@/components/forms/form-textarea"
@@ -33,7 +33,7 @@ type FragranceCreateScreenProps = {
   user: { name: string; role: string }
 }
 
-function parseNotes(value: string, pyramidLevel: "top" | "heart" | "base") {
+export function parseNotes(value: string, pyramidLevel: "top" | "heart" | "base") {
   return value
     .split(",")
     .map((name) => name.trim())
@@ -45,7 +45,6 @@ export function FragranceCreateScreen({ user }: FragranceCreateScreenProps) {
   const router = useRouter()
   const brands = useBrands()
   const mutations = useCatalogMutations()
-  const [notice, setNotice] = useState("")
   const brandItems = brands.data?.map((brand) => ({ label: brand.name, value: brand.id })) ?? []
 
   const brandForm = useForm<BrandForm>({ defaultValues: { name: "", description: "" } })
@@ -69,7 +68,7 @@ export function FragranceCreateScreen({ user }: FragranceCreateScreenProps) {
     fragranceForm.setValue("brandId", brand.id, { shouldDirty: true, shouldValidate: true })
     await brands.refetch()
     brandForm.reset()
-    setNotice("Brand created and selected.")
+    toast.add({ title: "Brand created and selected.", type: "success" })
   }
 
   async function submitFragrance(values: FragranceForm) {
@@ -117,8 +116,6 @@ export function FragranceCreateScreen({ user }: FragranceCreateScreenProps) {
             title="Fragrance details"
             icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={PerfumeIcon} strokeWidth={1.5} />}
           >
-            {notice ? <div className="mb-4 rounded-xl bg-admin-champagne/12 px-4 py-3 text-sm font-medium text-[color-mix(in_oklch,var(--admin-champagne),black_35%)]">{notice}</div> : null}
-
             <form className="grid gap-4" onSubmit={fragranceForm.handleSubmit(submitFragrance)}>
               <FormSelect
                 control={fragranceForm.control}

@@ -2,7 +2,14 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-import { getOrder, getOrders, updateOrderStatus } from "@/features/orders/api/orders"
+import {
+  getOrder,
+  getOrders,
+  recordPartialFulfillment,
+  setOrderPaymentProof,
+  toggleOrderChecklistItem,
+  updateOrderStatus,
+} from "@/features/orders/api/orders"
 import type { OrderStatus } from "@/types/orders"
 
 export const orderKeys = {
@@ -27,6 +34,20 @@ export function useOrderMutations() {
   return {
     updateStatus: useMutation({
       mutationFn: ({ id, status }: { id: string; status: OrderStatus }) => updateOrderStatus(id, status),
+      onSuccess: refreshOrders,
+    }),
+    setPaymentProof: useMutation({
+      mutationFn: ({ id, publicUrl }: { id: string; publicUrl: string }) => setOrderPaymentProof(id, publicUrl),
+      onSuccess: refreshOrders,
+    }),
+    toggleChecklistItem: useMutation({
+      mutationFn: ({ id, checklistItemId }: { id: string; checklistItemId: string }) =>
+        toggleOrderChecklistItem(id, checklistItemId),
+      onSuccess: refreshOrders,
+    }),
+    recordPartialFulfillment: useMutation({
+      mutationFn: ({ id, itemId, fulfilledQuantity }: { id: string; itemId: string; fulfilledQuantity: number }) =>
+        recordPartialFulfillment(id, itemId, fulfilledQuantity),
       onSuccess: refreshOrders,
     }),
   }

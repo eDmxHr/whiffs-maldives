@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -10,6 +9,7 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { Inspector, PageWrapper, SectionWrapper } from "@/components/layouts/page"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { toast } from "@/components/ui/toast"
 import { FormInput } from "@/components/forms/form-input"
 import { FormSelect } from "@/components/forms/form-select"
 import { useCatalogMutations, useFragrances, useSuppliers } from "@/features/catalog/hooks/use-catalog"
@@ -34,7 +34,6 @@ export function BottleCreateScreen({ user }: BottleCreateScreenProps) {
   const fragrances = useFragrances()
   const suppliers = useSuppliers()
   const mutations = useCatalogMutations()
-  const [notice, setNotice] = useState("")
 
   const fragranceItems =
     fragrances.data?.map((fragrance) => ({ label: `${fragrance.brand.name} - ${fragrance.name}`, value: fragrance.id })) ?? []
@@ -58,7 +57,7 @@ export function BottleCreateScreen({ user }: BottleCreateScreenProps) {
     bottleForm.setValue("supplierId", supplier.id, { shouldDirty: true, shouldValidate: true })
     await suppliers.refetch()
     supplierForm.reset()
-    setNotice("Supplier created and selected.")
+    toast.add({ title: "Supplier created and selected.", type: "success" })
   }
 
   async function submitBottle(values: BottleForm) {
@@ -103,8 +102,6 @@ export function BottleCreateScreen({ user }: BottleCreateScreenProps) {
             title="Bottle details"
             icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={MilkBottleIcon} strokeWidth={1.5} />}
           >
-            {notice ? <div className="mb-4 rounded-xl bg-admin-champagne/12 px-4 py-3 text-sm font-medium text-[color-mix(in_oklch,var(--admin-champagne),black_35%)]">{notice}</div> : null}
-
             <form className="grid gap-4" onSubmit={bottleForm.handleSubmit(submitBottle)}>
               <div className="grid gap-4 md:grid-cols-2">
                 <FormSelect

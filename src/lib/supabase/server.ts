@@ -53,10 +53,20 @@ export async function getCurrentProfile() {
     return null
   }
 
+  const { data: userRole } = await supabase
+    .from("user_roles")
+    .select("roles(name)")
+    .eq("user_id", user.id)
+    .limit(1)
+    .maybeSingle()
+
+  const roleRecord = userRole?.roles as { name?: string } | { name?: string }[] | null
+  const roleName = (Array.isArray(roleRecord) ? roleRecord[0]?.name : roleRecord?.name) ?? "Owner"
+
   return {
     id: data.id,
     name: data.name ?? user.email ?? "Owner",
-    role: "Owner",
+    role: roleName,
     demoMode: false,
   }
 }

@@ -10,12 +10,21 @@ export type PaymentStatus = "pending" | "paid" | "failed" | "refunded"
 
 export interface OrderItem {
   id: string
+  fragranceId: string
+  offeringId: string
   fragranceName: string
   offeringName: string
   sizeMl: number
   quantity: number
   unitPrice: number
   totalPrice: number
+  fulfilledQuantity: number
+}
+
+export interface FulfillmentChecklistItem {
+  id: string
+  label: string
+  done: boolean
 }
 
 export interface Order {
@@ -33,6 +42,8 @@ export interface Order {
   deliveryMethod: string
   deliveryAddress: string
   notes: string
+  paymentProofUrl: string
+  fulfillmentChecklist: FulfillmentChecklistItem[]
   createdAt: string
   updatedAt: string
 }

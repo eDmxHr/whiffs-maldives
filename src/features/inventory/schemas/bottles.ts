@@ -10,6 +10,21 @@ export const createBottleSchema = z.object({
   notes: z.string().optional().default(""),
 })
 
+export const updateBottleSchema = z.object({
+  fragranceId: z.string().min(1),
+  supplierId: z.string().min(1),
+  originalVolumeMl: z.number().positive(),
+  usableVolumeMl: z.number().positive(),
+  purchasePrice: z.number().nonnegative(),
+  purchaseDate: z.string().min(1),
+  notes: z.string().optional().default(""),
+})
+
+export const adjustBottleSchema = z.object({
+  quantityMl: z.number().refine((value) => value !== 0, "Enter a non-zero volume change."),
+  reason: z.string().min(1),
+})
+
 export const createSupplierSchema = z.object({
   name: z.string().min(2),
   phone: z.string().optional().default(""),

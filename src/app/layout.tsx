@@ -4,6 +4,7 @@ import localFont from "next/font/local"
 import "./globals.css"
 import { QueryProvider } from "@/components/providers/query-provider"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" })
@@ -31,7 +32,9 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <Toaster>{children}</Toaster>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

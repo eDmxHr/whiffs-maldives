@@ -10,6 +10,7 @@ import { AdminShell } from "@/components/layouts/admin-shell"
 import { PageWrapper, SectionWrapper } from "@/components/layouts/page"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
+import { toast } from "@/components/ui/toast"
 import { FormInput } from "@/components/forms/form-input"
 import {
   useSettings,
@@ -36,8 +37,8 @@ type SettingsScreenProps = {
 export function SettingsScreen({ user }: SettingsScreenProps) {
   const settings = useSettings()
   const updateSettings = useUpdateSettings()
-  const [notice, setNotice] = useState("")
-  const [gstEnabled, setGstEnabled] = useState(false)
+  const [gstEnabledOverride, setGstEnabledOverride] = useState<boolean | null>(null)
+  const gstEnabled = gstEnabledOverride ?? settings.data?.gstEnabled ?? false
 
   const form = useForm<SettingsForm>({
     defaultValues: {
@@ -72,12 +73,10 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
         packagingCost: String(settings.data.packagingCost),
         operationsBuffer: String(settings.data.operationsBuffer),
       })
-      setGstEnabled(settings.data.gstEnabled)
     }
   }, [settings.data, form])
 
   async function submit(values: SettingsForm) {
-    setNotice("")
     await updateSettings.mutateAsync({
       wasteAllowancePercent: Number(values.wasteAllowancePercent),
       lowVolumeThresholdMl: Number(values.lowVolumeThresholdMl),
@@ -91,7 +90,7 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
       operationsBuffer: Number(values.operationsBuffer),
       gstEnabled,
     })
-    setNotice("Settings saved.")
+    toast.add({ title: "Settings saved.", type: "success" })
   }
 
   return (
@@ -105,12 +104,6 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
         description="Business-wide defaults used across inventory, pricing, and order workflows."
       >
         <div className="grid gap-5">
-          {notice ? (
-            <div className="rounded-xl bg-admin-champagne/12 px-4 py-3 text-sm font-medium text-[color-mix(in_oklch,var(--admin-champagne),black_35%)]">
-              {notice}
-            </div>
-          ) : null}
-
           {settings.isLoading ? (
             <LoadingState label="Loading settings..." />
           ) : (
@@ -239,7 +232,7 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
                       </div>
                       <Switch
                         checked={gstEnabled}
-                        onCheckedChange={setGstEnabled}
+                        onCheckedChange={setGstEnabledOverride}
                       />
                     </div>
                   </div>

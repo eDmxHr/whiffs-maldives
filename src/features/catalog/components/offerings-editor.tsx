@@ -7,6 +7,7 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { toast } from "@/components/ui/toast"
 import {
   Table,
   TableBody,
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/table"
 import { useCatalogMutations } from "@/features/catalog/hooks/use-catalog"
 import { useSettings } from "@/features/settings/hooks/use-settings"
+import { earliestAvailableBottle } from "@/lib/inventory"
 import { money } from "@/lib/money"
 import { calculateDecantPrice } from "@/lib/pricing"
 import type { Bottle, Offering } from "@/types/catalog"
@@ -27,12 +29,6 @@ type OfferingsEditorProps = {
   fragranceId: string
   offerings: Offering[]
   bottles: Bottle[]
-}
-
-function earliestAvailableBottle(bottles: Bottle[]) {
-  return bottles
-    .filter((bottle) => bottle.status === "available" || bottle.status === "low_volume")
-    .sort((a, b) => new Date(a.receivedAt).getTime() - new Date(b.receivedAt).getTime())[0]
 }
 
 function toRows(offerings: Offering[]): OfferingRow[] {
@@ -53,7 +49,6 @@ export function OfferingsEditor({ fragranceId, offerings, bottles }: OfferingsEd
   const [newSize, setNewSize] = useState("")
   const [newPrice, setNewPrice] = useState("")
   const [error, setError] = useState("")
-  const [notice, setNotice] = useState("")
 
   const suggestionBottle = earliestAvailableBottle(bottles)
 
@@ -124,11 +119,10 @@ export function OfferingsEditor({ fragranceId, offerings, bottles }: OfferingsEd
 
   async function save() {
     setError("")
-    setNotice("")
 
     try {
       await mutations.saveOfferings.mutateAsync({ fragranceId, offerings: rows })
-      setNotice("Offerings saved.")
+      toast.add({ title: "Offerings saved.", type: "success" })
     } catch (mutationError) {
       const message =
         mutationError && typeof mutationError === "object" && "message" in mutationError
@@ -140,11 +134,6 @@ export function OfferingsEditor({ fragranceId, offerings, bottles }: OfferingsEd
 
   return (
     <div className="grid gap-4">
-      {notice ? (
-        <div className="rounded-xl bg-admin-champagne/12 px-4 py-3 text-sm font-medium text-[color-mix(in_oklch,var(--admin-champagne),black_35%)]">
-          {notice}
-        </div>
-      ) : null}
       {error ? (
         <div className="rounded-xl bg-admin-danger/12 px-4 py-3 text-sm font-medium text-admin-danger">{error}</div>
       ) : null}
