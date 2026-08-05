@@ -20,7 +20,7 @@ export function SignInForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<SignInFormValues>({
-    defaultValues: { email: "owner@whiffsmaldives.mv", password: "local-first" },
+    defaultValues: { email: "", password: "" },
   })
 
   async function submit(values: SignInFormValues) {

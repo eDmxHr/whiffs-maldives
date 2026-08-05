@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth"
 import { collection, fail } from "@/lib/api-response"
-import { demoStore } from "@/lib/demo-store"
+import { createClient } from "@/lib/supabase/server"
+import { mapInventoryEvent } from "@/lib/supabase/catalog-repository"
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin()
@@ -10,5 +11,16 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   }
 
   const { id } = await context.params
-  return collection(demoStore.listInventoryEvents(id))
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from("inventory_events")
+    .select("*")
+    .eq("bottle_id", id)
+    .order("created_at", { ascending: false })
+
+  if (error || !data) {
+    return collection([])
+  }
+
+  return collection(data.map(mapInventoryEvent))
 }

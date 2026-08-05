@@ -56,7 +56,7 @@ create table public.fragrances (
   release_year integer,
   perfumer text,
   gender text,
-  status text not null default 'draft' check (status in ('draft', 'published')),
+  status text not null default 'draft' check (status in ('draft', 'published', 'archived')),
   is_active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -127,7 +127,8 @@ create table public.bottles (
   notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  check (remaining_volume_ml <= usable_volume_ml)
+  check (remaining_volume_ml <= usable_volume_ml),
+  check (usable_volume_ml <= original_volume_ml)
 );
 
 create table public.inventory_events (

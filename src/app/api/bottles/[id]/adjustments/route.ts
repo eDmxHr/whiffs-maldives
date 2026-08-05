@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth"
 import { fail, ok } from "@/lib/api-response"
-import { demoStore } from "@/lib/demo-store"
+import { createClient } from "@/lib/supabase/server"
+import { mapBottle } from "@/lib/supabase/catalog-repository"
 import { adjustBottleSchema } from "@/features/inventory/schemas/bottles"
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
@@ -17,11 +18,20 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     return fail("VALIDATION_ERROR", "Adjustment details are incomplete.", 422, parsed.error.flatten().fieldErrors)
   }
 
-  const result = demoStore.adjustBottle(id, parsed.data)
+  const supabase = await createClient()
+  const { data, error } = await supabase.rpc("adjust_bottle_volume", {
+    p_bottle_id: id,
+    p_quantity_ml: parsed.data.quantityMl,
+    p_reason: parsed.data.reason,
+  })
 
-  if ("error" in result) {
+  if (error || !data) {
+    if (error?.message?.includes("FORBIDDEN")) {
+      return fail("UNAUTHORIZED", "Sign in with an owner account to adjust inventory.", 401)
+    }
+
     return fail("NOT_FOUND", "Bottle was not found.", 404)
   }
 
-  return ok(result.data)
+  return ok(mapBottle(data))
 }

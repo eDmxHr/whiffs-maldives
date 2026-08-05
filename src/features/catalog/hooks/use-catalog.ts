@@ -90,8 +90,7 @@ export function useCatalogMutations() {
     }),
     archiveFragrance: useMutation({ mutationFn: archiveFragrance, onSuccess: refreshCatalog }),
     addFragranceImage: useMutation({
-      mutationFn: ({ fragranceId, publicUrl }: { fragranceId: string; publicUrl: string }) =>
-        addFragranceImage(fragranceId, { publicUrl }),
+      mutationFn: ({ fragranceId, file }: { fragranceId: string; file: File }) => addFragranceImage(fragranceId, file),
       onSuccess: refreshCatalog,
     }),
     reorderFragranceImages: useMutation({

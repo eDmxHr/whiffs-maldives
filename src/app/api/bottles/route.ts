@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth"
 import { collection, fail, ok } from "@/lib/api-response"
-import { demoStore } from "@/lib/demo-store"
+import { createClient } from "@/lib/supabase/server"
+import { mapBottle } from "@/lib/supabase/catalog-repository"
 import { createBottleSchema } from "@/features/inventory/schemas/bottles"
 
 export async function GET() {
@@ -10,7 +11,14 @@ export async function GET() {
     return fail("UNAUTHORIZED", "Sign in with an owner account to view bottles.", 401)
   }
 
-  return collection(demoStore.listBottles())
+  const supabase = await createClient()
+  const { data, error } = await supabase.from("bottles").select("*").order("received_at", { ascending: false })
+
+  if (error || !data) {
+    return collection([])
+  }
+
+  return collection(data.map(mapBottle))
 }
 
 export async function POST(request: Request) {
@@ -26,11 +34,24 @@ export async function POST(request: Request) {
     return fail("VALIDATION_ERROR", "Bottle details are incomplete.", 422, parsed.error.flatten().fieldErrors)
   }
 
-  const result = demoStore.createBottle(parsed.data)
+  const supabase = await createClient()
+  const { data, error } = await supabase.rpc("create_bottle", {
+    p_fragrance_id: parsed.data.fragranceId,
+    p_supplier_id: parsed.data.supplierId,
+    p_original_volume_ml: parsed.data.originalVolumeMl,
+    p_usable_volume_ml: parsed.data.usableVolumeMl,
+    p_purchase_price: parsed.data.purchasePrice,
+    p_purchase_date: parsed.data.purchaseDate,
+    p_notes: parsed.data.notes || null,
+  })
 
-  if ("error" in result) {
+  if (error || !data) {
+    if (error?.message?.includes("FORBIDDEN")) {
+      return fail("UNAUTHORIZED", "Sign in with an owner account to add bottles.", 401)
+    }
+
     return fail("VALIDATION_ERROR", "Usable volume must be positive and cannot exceed original volume.", 422)
   }
 
-  return ok(result.data, { status: 201 })
+  return ok(mapBottle(data), { status: 201 })
 }

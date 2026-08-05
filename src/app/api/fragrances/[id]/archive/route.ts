@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth"
 import { fail, ok } from "@/lib/api-response"
-import { demoStore } from "@/lib/demo-store"
+import { createClient } from "@/lib/supabase/server"
+import { fetchFragranceView } from "@/lib/supabase/catalog-repository"
 
 export async function POST(_request: Request, context: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin()
@@ -10,7 +11,15 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
   }
 
   const { id } = await context.params
-  const fragrance = demoStore.archiveFragrance(id)
+  const supabase = await createClient()
+
+  const { error } = await supabase.from("fragrances").update({ status: "archived" }).eq("id", id)
+
+  if (error) {
+    return fail("NOT_FOUND", "Fragrance was not found.", 404)
+  }
+
+  const fragrance = await fetchFragranceView(supabase, id)
 
   if (!fragrance) {
     return fail("NOT_FOUND", "Fragrance was not found.", 404)

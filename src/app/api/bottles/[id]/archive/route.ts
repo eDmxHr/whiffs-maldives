@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth"
 import { fail, ok } from "@/lib/api-response"
-import { demoStore } from "@/lib/demo-store"
+import { createClient } from "@/lib/supabase/server"
+import { mapBottle } from "@/lib/supabase/catalog-repository"
 
 export async function POST(_request: Request, context: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin()
@@ -10,11 +11,13 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
   }
 
   const { id } = await context.params
-  const bottle = demoStore.archiveBottle(id)
+  const supabase = await createClient()
 
-  if (!bottle) {
+  const { data, error } = await supabase.from("bottles").update({ status: "archived" }).eq("id", id).select("*").single()
+
+  if (error || !data) {
     return fail("NOT_FOUND", "Bottle was not found.", 404)
   }
 
-  return ok(bottle)
+  return ok(mapBottle(data))
 }

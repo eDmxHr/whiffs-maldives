@@ -10,8 +10,7 @@ export default function SignInPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-admin-champagne">Whiffs Maldives</p>
           <h1 className="mt-3 font-heading text-2xl font-semibold">Owner sign in</h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Local-first mode opens the owner workspace without live Supabase credentials. Add Supabase env values later to
-            switch this into real authentication.
+            Sign in with your Whiffs Maldives owner account to access the workspace.
           </p>
           <div className="mt-6">
             <SignInForm />

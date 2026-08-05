@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/toast"
 import { FormUpload } from "@/components/forms/form-upload"
 import { useCatalogMutations } from "@/features/catalog/hooks/use-catalog"
-import { readFileAsDataUrl } from "@/lib/files"
 import type { FragranceImage } from "@/types/catalog"
 
 type ImageGalleryEditorProps = {
@@ -39,8 +38,7 @@ export function ImageGalleryEditor({ fragranceId, images }: ImageGalleryEditorPr
 
     try {
       for (const file of files) {
-        const publicUrl = await readFileAsDataUrl(file)
-        await mutations.addFragranceImage.mutateAsync({ fragranceId, publicUrl })
+        await mutations.addFragranceImage.mutateAsync({ fragranceId, file })
       }
       form.reset({ files: null })
       toast.add({ title: "Images uploaded.", type: "success" })

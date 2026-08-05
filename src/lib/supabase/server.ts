@@ -47,26 +47,17 @@ export async function getCurrentProfile() {
     return null
   }
 
-  const { data } = await supabase.from("profiles").select("id,name,avatar_url,is_active").eq("id", user.id).single()
+  const { data } = await supabase.rpc("get_my_context")
+  const context = data?.[0]
 
-  if (!data?.is_active) {
+  if (!context || !context.is_active || !context.role_name) {
     return null
   }
 
-  const { data: userRole } = await supabase
-    .from("user_roles")
-    .select("roles(name)")
-    .eq("user_id", user.id)
-    .limit(1)
-    .maybeSingle()
-
-  const roleRecord = userRole?.roles as { name?: string } | { name?: string }[] | null
-  const roleName = (Array.isArray(roleRecord) ? roleRecord[0]?.name : roleRecord?.name) ?? "Owner"
-
   return {
-    id: data.id,
-    name: data.name ?? user.email ?? "Owner",
-    role: roleName,
+    id: context.id,
+    name: context.name ?? user.email ?? "Owner",
+    role: context.role_name,
     demoMode: false,
   }
 }

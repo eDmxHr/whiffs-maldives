@@ -24,11 +24,6 @@ export const createFragranceSchema = z.object({
   notes: z.array(fragranceNoteSchema).default([]),
 })
 
-export const imageSchema = z.object({
-  publicUrl: z.string().url(),
-  storagePath: z.string().optional(),
-})
-
 export const reorderImagesSchema = z.object({
   imageIds: z.array(z.string()).min(1),
 })

@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth"
 import { collection, fail } from "@/lib/api-response"
-import { demoStore } from "@/lib/demo-store"
+import { createClient } from "@/lib/supabase/server"
+import { mapFragranceImage } from "@/lib/supabase/catalog-repository"
 import { reorderImagesSchema } from "@/features/catalog/schemas/catalog"
 
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
@@ -17,11 +18,31 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     return fail("VALIDATION_ERROR", "Choose at least one image to reorder.", 422, parsed.error.flatten().fieldErrors)
   }
 
-  const images = demoStore.reorderImages(id, parsed.data.imageIds)
+  const supabase = await createClient()
 
-  if (!images) {
+  const { data: existing } = await supabase.from("fragrance_images").select("id").eq("fragrance_id", id)
+
+  if (!existing?.length) {
     return fail("NOT_FOUND", "Fragrance was not found.", 404)
   }
 
-  return collection(images)
+  const orderedIds = parsed.data.imageIds.filter((imageId) => existing.some((row) => row.id === imageId))
+
+  // Two-phase move: park every row at a high offset first so no intermediate
+  // update can collide with the (fragrance_id, position) unique constraint,
+  // then assign final positions.
+  for (const [index, imageId] of orderedIds.entries()) {
+    await supabase
+      .from("fragrance_images")
+      .update({ position: 1000 + index })
+      .eq("id", imageId)
+  }
+
+  for (const [index, imageId] of orderedIds.entries()) {
+    await supabase.from("fragrance_images").update({ position: index + 1 }).eq("id", imageId)
+  }
+
+  const { data } = await supabase.from("fragrance_images").select("*").eq("fragrance_id", id).order("position")
+
+  return collection((data ?? []).map(mapFragranceImage))
 }

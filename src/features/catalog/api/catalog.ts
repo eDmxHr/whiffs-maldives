@@ -50,8 +50,13 @@ export async function archiveFragrance(fragranceId: string) {
   return data.data
 }
 
-export async function addFragranceImage(fragranceId: string, input: { publicUrl: string }) {
-  const { data } = await apiClient.post<ApiSuccess<FragranceImage>>(`/fragrances/${fragranceId}/images`, input)
+export async function addFragranceImage(fragranceId: string, file: File) {
+  const formData = new FormData()
+  formData.append("file", file)
+
+  const { data } = await apiClient.post<ApiSuccess<FragranceImage>>(`/fragrances/${fragranceId}/images`, formData, {
+    headers: { "Content-Type": undefined },
+  })
   return data.data
 }
 

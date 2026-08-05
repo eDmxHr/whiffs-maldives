@@ -6,8 +6,10 @@ export type ApiErrorCode =
   | "INSUFFICIENT_PUBLISH_DATA"
   | "INVALID_STATUS_TRANSITION"
   | "UNAUTHORIZED"
+  | "FORBIDDEN"
   | "NOT_FOUND"
   | "VALIDATION_ERROR"
+  | "UPLOAD_FAILED"
   | "SERVER_ERROR"
 
 export interface ApiError {

@@ -1,10 +1,19 @@
 import { requireAdmin } from "@/lib/auth"
 import { collection, fail, ok } from "@/lib/api-response"
-import { demoStore } from "@/lib/demo-store"
+import { slugify } from "@/lib/slug"
+import { createClient } from "@/lib/supabase/server"
+import { mapBrand } from "@/lib/supabase/catalog-repository"
 import { createBrandSchema } from "@/features/catalog/schemas/catalog"
 
 export async function GET() {
-  return collection(demoStore.listBrands())
+  const supabase = await createClient()
+  const { data, error } = await supabase.from("brands").select("*").order("name")
+
+  if (error || !data) {
+    return collection([])
+  }
+
+  return collection(data.map(mapBrand))
 }
 
 export async function POST(request: Request) {
@@ -20,11 +29,22 @@ export async function POST(request: Request) {
     return fail("VALIDATION_ERROR", "Brand details are incomplete.", 422, parsed.error.flatten().fieldErrors)
   }
 
-  const result = demoStore.createBrand(parsed.data)
+  const supabase = await createClient()
+  const slug = slugify(parsed.data.name)
 
-  if ("error" in result) {
-    return fail("DUPLICATE_SLUG", "A brand with this slug already exists.", 409)
+  const { data, error } = await supabase
+    .from("brands")
+    .insert({ name: parsed.data.name, slug, description: parsed.data.description || null })
+    .select("*")
+    .single()
+
+  if (error) {
+    if (error.code === "23505") {
+      return fail("DUPLICATE_SLUG", "A brand with this slug already exists.", 409)
+    }
+
+    return fail("VALIDATION_ERROR", "Could not create the brand.", 422)
   }
 
-  return ok(result.data, { status: 201 })
+  return ok(mapBrand(data), { status: 201 })
 }
