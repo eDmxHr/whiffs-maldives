@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Calculator01Icon, Settings02Icon } from "@hugeicons/core-free-icons"
-import { HugeiconsIcon } from "@hugeicons/react"
 
 import { LoadingState } from "@/components/common/loading-state"
 import { AdminShell } from "@/components/layouts/admin-shell"
@@ -112,14 +111,7 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
                 <SectionWrapper
                   headerEyebrow="Business settings"
                   title="Operational defaults"
-                  icon={
-                    <HugeiconsIcon
-                      aria-hidden="true"
-                      className="size-5 text-admin-reef"
-                      icon={Settings02Icon}
-                      strokeWidth={1.5}
-                    />
-                  }
+                  icon={Settings02Icon}
                 >
                   <div className="grid gap-4">
                     <div className="grid gap-4 md:grid-cols-2">
@@ -169,14 +161,7 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
                 <SectionWrapper
                   headerEyebrow="Business settings"
                   title="Pricing formula"
-                  icon={
-                    <HugeiconsIcon
-                      aria-hidden="true"
-                      className="size-5 text-admin-reef"
-                      icon={Calculator01Icon}
-                      strokeWidth={1.5}
-                    />
-                  }
+                  icon={Calculator01Icon}
                 >
                   <div className="grid gap-4">
                     <div className="grid gap-4 md:grid-cols-2">

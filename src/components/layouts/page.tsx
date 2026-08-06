@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react"
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react"
 
 import type { BreadcrumbItem } from "@/components/common/breadcrumbs"
 import { Breadcrumbs } from "@/components/common/breadcrumbs"
@@ -33,7 +34,7 @@ export function Heading({
       >
         <div className="min-w-0">
           {eyebrow ? (
-            <p className="text-xs font-semibold tracking-[0.24em] text-admin-champagne uppercase">
+            <p className="text-xs font-semibold tracking-widest text-admin-champagne uppercase">
               {eyebrow}
             </p>
           ) : null}
@@ -57,7 +58,7 @@ export function Heading({
     <div className={cn("flex items-center justify-between gap-3", className)}>
       <div className="min-w-0">
         {eyebrow ? (
-          <p className="text-xs font-semibold tracking-[0.18em] text-admin-champagne uppercase">
+          <p className="text-xs font-semibold tracking-wider text-admin-champagne uppercase">
             {eyebrow}
           </p>
         ) : null}
@@ -135,7 +136,7 @@ export function PageWrapper({
 type SectionWrapperProps = HTMLAttributes<HTMLElement> & {
   title?: string
   description?: string
-  icon?: ReactNode
+  icon?: IconSvgElement
   actions?: ReactNode
   headerEyebrow?: string
 }
@@ -162,7 +163,11 @@ export function SectionWrapper({
             eyebrow={headerEyebrow}
             title={title}
             description={description}
-            icon={icon}
+            icon={
+              icon ? (
+                <HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={icon} strokeWidth={1.5} />
+              ) : null
+            }
             actions={actions}
           />
         </div>

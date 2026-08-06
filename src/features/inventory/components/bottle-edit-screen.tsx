@@ -108,7 +108,7 @@ export function BottleEditScreen({ user, bottleId }: BottleEditScreenProps) {
           <SectionWrapper
             headerEyebrow="Inventory"
             title="Bottle details"
-            icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={MilkBottleIcon} strokeWidth={1.5} />}
+            icon={MilkBottleIcon}
           >
             <form className="grid gap-4" onSubmit={form.handleSubmit(submit)}>
               <div className="grid gap-4 md:grid-cols-2">

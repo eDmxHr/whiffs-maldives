@@ -149,7 +149,7 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
           <SectionWrapper
             headerEyebrow="Operations"
             title="Packaging inventory"
-            icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={Package02Icon} strokeWidth={1.5} />}
+            icon={Package02Icon}
           >
             {items.isLoading ? (
               <LoadingState label="Loading packaging items..." surface="plain" />

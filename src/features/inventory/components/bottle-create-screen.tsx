@@ -1,14 +1,14 @@
 "use client"
 
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { ArrowLeft02Icon, MilkBottleIcon, PlusSignIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 
+import { IconLink } from "@/components/common/icon-link"
 import { AdminShell } from "@/components/layouts/admin-shell"
-import { Inspector, PageWrapper, SectionWrapper } from "@/components/layouts/page"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Heading, Inspector, PageWrapper, SectionWrapper } from "@/components/layouts/page"
+import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/toast"
 import { FormInput } from "@/components/forms/form-input"
 import { FormSelect } from "@/components/forms/form-select"
@@ -82,10 +82,9 @@ export function BottleCreateScreen({ user }: BottleCreateScreenProps) {
   }
 
   const backAction = (
-    <Link className={buttonVariants({ variant: "outline" })} href="/admin/bottles">
-      <HugeiconsIcon aria-hidden="true" data-icon="inline-start" icon={ArrowLeft02Icon} strokeWidth={1.5} />
+    <IconLink href="/admin/bottles" icon={ArrowLeft02Icon}>
       Back to bottles
-    </Link>
+    </IconLink>
   )
 
   return (
@@ -100,7 +99,7 @@ export function BottleCreateScreen({ user }: BottleCreateScreenProps) {
           <SectionWrapper
             headerEyebrow="Inventory"
             title="Bottle details"
-            icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={MilkBottleIcon} strokeWidth={1.5} />}
+            icon={MilkBottleIcon}
           >
             <form className="grid gap-4" onSubmit={bottleForm.handleSubmit(submitBottle)}>
               <div className="grid gap-4 md:grid-cols-2">
@@ -145,8 +144,7 @@ export function BottleCreateScreen({ user }: BottleCreateScreenProps) {
 
           <Inspector>
             <div className="px-3 pt-2 pb-3">
-              <p className="text-xs font-semibold tracking-[0.18em] text-admin-champagne uppercase">Supplier</p>
-              <h2 className="mt-1 text-lg font-semibold">Create supplier</h2>
+              <Heading size="section" eyebrow="Supplier" title="Create supplier" />
             </div>
             <div className="flex flex-1 flex-col rounded-xl bg-background p-4 md:p-5">
               <form className="grid gap-4" onSubmit={supplierForm.handleSubmit(submitSupplier)}>

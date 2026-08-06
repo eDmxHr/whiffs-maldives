@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react"
 import { UserGroup02Icon } from "@hugeicons/core-free-icons"
 
+import { DetailField, DetailGrid } from "@/components/common/detail-field"
 import { EmptyState } from "@/components/common/empty-state"
+import { FieldLabel } from "@/components/common/field-label"
 import { LoadingState } from "@/components/common/loading-state"
 import { SearchInput } from "@/components/common/search-input"
 import { StatusBadge } from "@/components/common/status-badge"
 import { AdminShell } from "@/components/layouts/admin-shell"
-import { Inspector, PageWrapper, Toolbar } from "@/components/layouts/page"
+import { Heading, Inspector, PageWrapper, Toolbar } from "@/components/layouts/page"
 import {
   Table,
   TableBody,
@@ -103,8 +105,7 @@ export function CustomersScreen({ user }: CustomersScreenProps) {
 
             <Inspector>
               <div className="px-3 pb-3 pt-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-admin-champagne">Inspector</p>
-                <h2 className="mt-1 text-lg font-semibold">Customer detail</h2>
+                <Heading size="section" eyebrow="Inspector" title="Customer detail" />
               </div>
               <div className="flex flex-1 flex-col rounded-xl bg-background p-4 md:p-5">
                 {customerDetail.data ? (
@@ -116,23 +117,15 @@ export function CustomersScreen({ user }: CustomersScreenProps) {
                     </div>
 
                     <div className="py-4">
-                      <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">Value</p>
-                      <div className="mt-3 grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-xs text-muted-foreground">Orders</p>
-                          <p className="mt-1 text-base font-semibold text-foreground">{customerDetail.data.orderCount}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground">Lifetime value</p>
-                          <p className="mt-1 text-base font-semibold text-foreground">
-                            {money(customerDetail.data.lifetimeValue)}
-                          </p>
-                        </div>
-                      </div>
+                      <FieldLabel>Value</FieldLabel>
+                      <DetailGrid cols={2}>
+                        <DetailField label="Orders" value={customerDetail.data.orderCount} />
+                        <DetailField label="Lifetime value" value={money(customerDetail.data.lifetimeValue)} />
+                      </DetailGrid>
                     </div>
 
                     <div className="py-4">
-                      <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">Order history</p>
+                      <FieldLabel>Order history</FieldLabel>
                       <div className="mt-3 grid gap-2">
                         {customerDetail.data.orders.map((order) => (
                           <div key={order.id} className="flex items-center justify-between gap-3">
@@ -146,7 +139,7 @@ export function CustomersScreen({ user }: CustomersScreenProps) {
 
                     {customerDetail.data.notes ? (
                       <div className="pt-4">
-                        <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">Notes</p>
+                        <FieldLabel>Notes</FieldLabel>
                         <p className="mt-2 leading-6 text-muted-foreground">{customerDetail.data.notes}</p>
                       </div>
                     ) : null}

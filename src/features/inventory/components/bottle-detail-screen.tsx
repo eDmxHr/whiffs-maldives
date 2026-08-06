@@ -1,16 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { useForm } from "react-hook-form"
 import {
   ArrowLeft02Icon,
   Edit02Icon,
   MilkBottleIcon,
 } from "@hugeicons/core-free-icons"
-import { HugeiconsIcon } from "@hugeicons/react"
 
+import { DetailField, DetailGrid } from "@/components/common/detail-field"
 import { EmptyState } from "@/components/common/empty-state"
+import { FieldLabel } from "@/components/common/field-label"
+import { IconLink } from "@/components/common/icon-link"
+import { InlineError } from "@/components/common/inline-error"
 import { LoadingState } from "@/components/common/loading-state"
 import {
   StatusBadge,
@@ -18,7 +20,7 @@ import {
 } from "@/components/common/status-badge"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { PageWrapper, SectionWrapper } from "@/components/layouts/page"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { FormInput } from "@/components/forms/form-input"
 import {
   Table,
@@ -37,6 +39,7 @@ import {
   useSuppliers,
 } from "@/features/catalog/hooks/use-catalog"
 import { formatDate, formatDateTime } from "@/lib/datetime"
+import { mutationErrorMessage } from "@/lib/errors"
 import { money } from "@/lib/money"
 
 type BottleDetailScreenProps = {
@@ -52,12 +55,6 @@ const eventTypeConfig: StatusBadgeConfig = {
   reserved: { label: "Reserved", variant: "neutral" },
   fulfilled: { label: "Fulfilled", variant: "success" },
   returned: { label: "Returned", variant: "neutral" },
-}
-
-function mutationErrorMessage(error: unknown, fallback: string) {
-  return error && typeof error === "object" && "message" in error
-    ? String((error as { message: unknown }).message)
-    : fallback
 }
 
 export function BottleDetailScreen({
@@ -115,30 +112,15 @@ export function BottleDetailScreen({
   }
 
   const backAction = (
-    <Link
-      className={buttonVariants({ variant: "outline" })}
-      href="/admin/bottles"
-    >
-      <HugeiconsIcon
-        aria-hidden="true"
-        data-icon="inline-start"
-        icon={ArrowLeft02Icon}
-        strokeWidth={1.5}
-      />
+    <IconLink href="/admin/bottles" icon={ArrowLeft02Icon}>
       Back to bottles
-    </Link>
+    </IconLink>
   )
 
   const editAction = (
-    <Link className={buttonVariants()} href={`/admin/bottles/${bottleId}/edit`}>
-      <HugeiconsIcon
-        aria-hidden="true"
-        data-icon="inline-start"
-        icon={Edit02Icon}
-        strokeWidth={1.5}
-      />
+    <IconLink href={`/admin/bottles/${bottleId}/edit`} icon={Edit02Icon} variant="default">
       Edit
-    </Link>
+    </IconLink>
   )
 
   return (
@@ -167,14 +149,7 @@ export function BottleDetailScreen({
             <SectionWrapper
               headerEyebrow="Inventory"
               title="Bottle detail"
-              icon={
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  className="size-5 text-admin-reef"
-                  icon={MilkBottleIcon}
-                  strokeWidth={1.5}
-                />
-              }
+              icon={MilkBottleIcon}
             >
               <div className="divide-y divide-border text-sm">
                 <div className="flex items-start justify-between gap-3 pb-4">
@@ -208,70 +183,30 @@ export function BottleDetailScreen({
                 </div>
 
                 {statusError ? (
-                  <div className="mt-4 rounded-xl bg-admin-danger/12 px-4 py-3 text-sm font-medium text-admin-danger">
-                    {statusError}
-                  </div>
+                  <InlineError className="mt-4">{statusError}</InlineError>
                 ) : null}
 
                 <div className="py-4">
-                  <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                    Volumes
-                  </p>
-                  <div className="mt-3 grid grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Original</p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {bottle.data.originalVolumeMl} ml
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Usable</p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {bottle.data.usableVolumeMl} ml
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Remaining</p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {bottle.data.remainingVolumeMl} ml
-                      </p>
-                    </div>
-                  </div>
+                  <FieldLabel>Volumes</FieldLabel>
+                  <DetailGrid>
+                    <DetailField label="Original" value={`${bottle.data.originalVolumeMl} ml`} />
+                    <DetailField label="Usable" value={`${bottle.data.usableVolumeMl} ml`} />
+                    <DetailField label="Remaining" value={`${bottle.data.remainingVolumeMl} ml`} />
+                  </DetailGrid>
                 </div>
 
                 <div className="py-4">
-                  <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                    Purchase
-                  </p>
-                  <div className="mt-3 grid grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Price</p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {money(bottle.data.purchasePrice)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">
-                        Purchase date
-                      </p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {bottle.data.purchaseDate}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Received</p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {formatDate(bottle.data.receivedAt)}
-                      </p>
-                    </div>
-                  </div>
+                  <FieldLabel>Purchase</FieldLabel>
+                  <DetailGrid>
+                    <DetailField label="Price" value={money(bottle.data.purchasePrice)} />
+                    <DetailField label="Purchase date" value={bottle.data.purchaseDate} />
+                    <DetailField label="Received" value={formatDate(bottle.data.receivedAt)} />
+                  </DetailGrid>
                 </div>
 
                 {bottle.data.notes ? (
                   <div className="pt-4">
-                    <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                      Notes
-                    </p>
+                    <FieldLabel>Notes</FieldLabel>
                     <p className="mt-2 leading-6 text-muted-foreground">
                       {bottle.data.notes}
                     </p>
@@ -284,20 +219,11 @@ export function BottleDetailScreen({
               headerEyebrow="Inventory"
               title="Adjust volume"
               description="Record spills, evaporation, residue, or corrections."
-              icon={
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  className="size-5 text-admin-reef"
-                  icon={MilkBottleIcon}
-                  strokeWidth={1.5}
-                />
-              }
+              icon={MilkBottleIcon}
             >
               <div className="grid gap-4">
                 {adjustmentError ? (
-                  <div className="rounded-xl bg-admin-danger/12 px-4 py-3 text-sm font-medium text-admin-danger">
-                    {adjustmentError}
-                  </div>
+                  <InlineError>{adjustmentError}</InlineError>
                 ) : null}
 
                 <form
@@ -343,14 +269,7 @@ export function BottleDetailScreen({
               headerEyebrow="Inventory"
               title="Ledger"
               description="Every volume movement for this bottle."
-              icon={
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  className="size-5 text-admin-reef"
-                  icon={MilkBottleIcon}
-                  strokeWidth={1.5}
-                />
-              }
+              icon={MilkBottleIcon}
             >
               {events.isLoading ? (
                 <LoadingState label="Loading ledger..." surface="plain" />

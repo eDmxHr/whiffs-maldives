@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { useForm } from "react-hook-form"
 import {
   ArrowLeft02Icon,
@@ -12,11 +11,14 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react"
 
 import { EmptyState } from "@/components/common/empty-state"
+import { FieldLabel } from "@/components/common/field-label"
+import { IconLink } from "@/components/common/icon-link"
+import { InlineError } from "@/components/common/inline-error"
 import { LoadingState } from "@/components/common/loading-state"
 import { StatusBadge } from "@/components/common/status-badge"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { PageWrapper, SectionWrapper } from "@/components/layouts/page"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { FormUpload } from "@/components/forms/form-upload"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/toast"
@@ -27,6 +29,7 @@ import {
 } from "@/features/orders/components/orders-screen"
 import { useOrderMutations, useOrder } from "@/features/orders/hooks/use-orders"
 import { formatDateTime } from "@/lib/datetime"
+import { mutationErrorMessage } from "@/lib/errors"
 import { earliestAvailableBottle } from "@/lib/inventory"
 import { readFileAsDataUrl } from "@/lib/files"
 import { money } from "@/lib/money"
@@ -65,12 +68,6 @@ const ORDER_ACTIONS: Record<
 }
 
 type ProofUploadForm = { file: File | null }
-
-function mutationErrorMessage(error: unknown, fallback: string) {
-  return error && typeof error === "object" && "message" in error
-    ? String((error as { message: unknown }).message)
-    : fallback
-}
 
 type OrderDetailScreenProps = {
   user: { name: string; role: string }
@@ -151,15 +148,9 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
   }
 
   const backAction = (
-    <Link className={buttonVariants({ variant: "outline" })} href="/admin/orders">
-      <HugeiconsIcon
-        aria-hidden="true"
-        data-icon="inline-start"
-        icon={ArrowLeft02Icon}
-        strokeWidth={1.5}
-      />
+    <IconLink href="/admin/orders" icon={ArrowLeft02Icon}>
       Back to orders
-    </Link>
+    </IconLink>
   )
 
   const actions = selectedOrder ? ORDER_ACTIONS[selectedOrder.status] : []
@@ -186,23 +177,12 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
           <LoadingState label="Loading order..." />
         ) : selectedOrder ? (
           <div className="grid gap-5">
-            {error ? (
-              <div className="rounded-xl bg-admin-danger/12 px-4 py-3 text-sm font-medium text-admin-danger">
-                {error}
-              </div>
-            ) : null}
+            {error ? <InlineError>{error}</InlineError> : null}
 
             <SectionWrapper
               headerEyebrow="Orders"
               title="Order"
-              icon={
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  className="size-5 text-admin-reef"
-                  icon={Invoice03Icon}
-                  strokeWidth={1.5}
-                />
-              }
+              icon={Invoice03Icon}
             >
               <div className="divide-y divide-border text-sm">
                 <div className="flex flex-col items-start justify-between gap-4 pb-5 sm:flex-row sm:items-center">
@@ -262,9 +242,7 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
                 </div>
 
                 <div className="py-5">
-                  <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                    Items
-                  </p>
+                  <FieldLabel>Items</FieldLabel>
                   <div className="mt-3 grid gap-3">
                     {selectedOrder.items.map((item) => (
                       <div key={item.id} className="grid gap-1.5">
@@ -317,9 +295,7 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
 
                 {showBottleAllocation ? (
                   <div className="py-5">
-                    <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                      Bottle allocation preview
-                    </p>
+                    <FieldLabel>Bottle allocation preview</FieldLabel>
                     <div className="mt-3 grid gap-2">
                       {selectedOrder.items.map((item) => {
                         const bottle = earliestAvailableBottle(
@@ -348,9 +324,7 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
 
                 {showChecklist ? (
                   <div className="py-5">
-                    <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                      Fulfillment checklist
-                    </p>
+                    <FieldLabel>Fulfillment checklist</FieldLabel>
                     <div className="mt-3 grid gap-2 sm:grid-cols-2">
                       {selectedOrder.fulfillmentChecklist.map(
                         (checklistItem) => (
@@ -382,9 +356,7 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
 
                 <div className="grid gap-5 py-5 sm:grid-cols-2">
                   <div>
-                    <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                      Payment proof
-                    </p>
+                    <FieldLabel>Payment proof</FieldLabel>
                     <div className="mt-3 grid gap-3">
                       {selectedOrder.paymentProofUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -421,9 +393,7 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
                   </div>
 
                   <div>
-                    <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                      Delivery
-                    </p>
+                    <FieldLabel>Delivery</FieldLabel>
                     <div className="mt-3 grid gap-1 text-muted-foreground">
                       <span>{selectedOrder.deliveryMethod}</span>
                       {selectedOrder.deliveryAddress ? (
@@ -431,9 +401,7 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
                       ) : null}
                     </div>
 
-                    <p className="mt-5 text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                      Total
-                    </p>
+                    <FieldLabel className="mt-5">Total</FieldLabel>
                     <div className="mt-3 grid gap-1">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">

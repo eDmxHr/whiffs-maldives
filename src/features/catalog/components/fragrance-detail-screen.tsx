@@ -1,20 +1,22 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import {
   ArrowLeft02Icon,
   Edit02Icon,
   PerfumeIcon,
 } from "@hugeicons/core-free-icons"
-import { HugeiconsIcon } from "@hugeicons/react"
 
+import { DetailField, DetailGrid } from "@/components/common/detail-field"
 import { EmptyState } from "@/components/common/empty-state"
+import { FieldLabel } from "@/components/common/field-label"
+import { IconLink } from "@/components/common/icon-link"
+import { InlineError } from "@/components/common/inline-error"
 import { LoadingState } from "@/components/common/loading-state"
 import { StatusBadge } from "@/components/common/status-badge"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { PageWrapper, SectionWrapper } from "@/components/layouts/page"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { fragranceStatusConfig } from "@/features/catalog/components/fragrance-screen"
 import { ImageGalleryEditor } from "@/features/catalog/components/image-gallery-editor"
 import { OfferingsEditor } from "@/features/catalog/components/offerings-editor"
@@ -22,6 +24,7 @@ import {
   useCatalogMutations,
   useFragrance,
 } from "@/features/catalog/hooks/use-catalog"
+import { mutationErrorMessage } from "@/lib/errors"
 import type { FragranceNote } from "@/types/catalog"
 
 type FragranceDetailScreenProps = {
@@ -41,12 +44,6 @@ function notesByLevel(
   return names.length ? names.join(", ") : "—"
 }
 
-function mutationErrorMessage(error: unknown, fallback: string) {
-  return error && typeof error === "object" && "message" in error
-    ? String((error as { message: unknown }).message)
-    : fallback
-}
-
 export function FragranceDetailScreen({
   user,
   fragranceId,
@@ -56,33 +53,15 @@ export function FragranceDetailScreen({
   const [statusError, setStatusError] = useState("")
 
   const backAction = (
-    <Link
-      className={buttonVariants({ variant: "outline" })}
-      href="/admin/fragrances"
-    >
-      <HugeiconsIcon
-        aria-hidden="true"
-        data-icon="inline-start"
-        icon={ArrowLeft02Icon}
-        strokeWidth={1.5}
-      />
+    <IconLink href="/admin/fragrances" icon={ArrowLeft02Icon}>
       Back to fragrances
-    </Link>
+    </IconLink>
   )
 
   const editAction = (
-    <Link
-      className={buttonVariants()}
-      href={`/admin/fragrances/${fragranceId}/edit`}
-    >
-      <HugeiconsIcon
-        aria-hidden="true"
-        data-icon="inline-start"
-        icon={Edit02Icon}
-        strokeWidth={1.5}
-      />
+    <IconLink href={`/admin/fragrances/${fragranceId}/edit`} icon={Edit02Icon} variant="default">
       Edit
-    </Link>
+    </IconLink>
   )
 
   async function publish() {
@@ -130,14 +109,7 @@ export function FragranceDetailScreen({
             <SectionWrapper
               headerEyebrow="Catalog"
               title="Fragrance detail"
-              icon={
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  className="size-5 text-admin-reef"
-                  icon={PerfumeIcon}
-                  strokeWidth={1.5}
-                />
-              }
+              icon={PerfumeIcon}
             >
               <div className="divide-y divide-border text-sm">
                 <div className="flex items-start justify-between gap-3 pb-4">
@@ -181,79 +153,37 @@ export function FragranceDetailScreen({
                 </div>
 
                 {statusError ? (
-                  <div className="mt-4 rounded-xl bg-admin-danger/12 px-4 py-3 text-sm font-medium text-admin-danger">
-                    {statusError}
-                  </div>
+                  <InlineError className="mt-4">{statusError}</InlineError>
                 ) : null}
 
                 <div className="py-4">
-                  <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                    Details
-                  </p>
-                  <div className="mt-3 grid grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Perfumer</p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {fragrance.data.perfumer || "—"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Gender</p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {fragrance.data.gender || "—"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">
-                        Release year
-                      </p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {fragrance.data.releaseYear ?? "—"}
-                      </p>
-                    </div>
-                  </div>
+                  <FieldLabel>Details</FieldLabel>
+                  <DetailGrid>
+                    <DetailField label="Perfumer" value={fragrance.data.perfumer || "—"} />
+                    <DetailField label="Gender" value={fragrance.data.gender || "—"} />
+                    <DetailField label="Release year" value={fragrance.data.releaseYear ?? "—"} />
+                  </DetailGrid>
                 </div>
 
                 <div className="py-4">
-                  <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                    Description
-                  </p>
+                  <FieldLabel>Description</FieldLabel>
                   <p className="mt-2 leading-6 text-muted-foreground">
                     {fragrance.data.description || "—"}
                   </p>
                 </div>
 
                 <div className="py-4">
-                  <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                    Catalog
-                  </p>
-                  <div className="mt-3 grid grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Images</p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {fragrance.data.images.length}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Offerings</p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {fragrance.data.offerings.length}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Bottles</p>
-                      <p className="mt-1 text-base font-semibold text-foreground">
-                        {fragrance.data.bottles.length}
-                      </p>
-                    </div>
-                  </div>
+                  <FieldLabel>Catalog</FieldLabel>
+                  <DetailGrid>
+                    <DetailField label="Images" value={fragrance.data.images.length} />
+                    <DetailField label="Offerings" value={fragrance.data.offerings.length} />
+                    <DetailField label="Bottles" value={fragrance.data.bottles.length} />
+                  </DetailGrid>
                 </div>
 
                 {fragrance.data.notes.length ? (
                   <div className="pt-4">
-                    <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                      Notes
-                    </p>
+                    <FieldLabel>Notes</FieldLabel>
                     <div className="mt-3 grid gap-3">
                       <div>
                         <p className="text-xs text-muted-foreground">
@@ -289,14 +219,7 @@ export function FragranceDetailScreen({
               headerEyebrow="Catalog"
               title="Images"
               description="The first image is the hero. Drag to reorder."
-              icon={
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  className="size-5 text-admin-reef"
-                  icon={PerfumeIcon}
-                  strokeWidth={1.5}
-                />
-              }
+              icon={PerfumeIcon}
             >
               <ImageGalleryEditor
                 key={fragranceId}
@@ -308,14 +231,7 @@ export function FragranceDetailScreen({
             <SectionWrapper
               headerEyebrow="Catalog"
               title="Offerings & pricing"
-              icon={
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  className="size-5 text-admin-reef"
-                  icon={PerfumeIcon}
-                  strokeWidth={1.5}
-                />
-              }
+              icon={PerfumeIcon}
             >
               <OfferingsEditor
                 key={fragranceId}

@@ -2,7 +2,6 @@
 
 import { useMemo } from "react"
 import { Analytics01Icon } from "@hugeicons/core-free-icons"
-import { HugeiconsIcon } from "@hugeicons/react"
 import {
   BarElement,
   CategoryScale,
@@ -69,7 +68,7 @@ export function ReportsScreen({ user }: ReportsScreenProps) {
             <SectionWrapper
               title="Sales over time"
               description="Revenue from paid orders over the last 30 days."
-              icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={Analytics01Icon} strokeWidth={1.5} />}
+              icon={Analytics01Icon}
             >
               <div className="h-72">
                 <Bar

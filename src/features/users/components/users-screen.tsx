@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { UserMultiple02Icon } from "@hugeicons/core-free-icons"
-import { HugeiconsIcon } from "@hugeicons/react"
 
 import { LoadingState } from "@/components/common/loading-state"
 import { StatusBadge, type StatusBadgeConfig } from "@/components/common/status-badge"
@@ -70,7 +69,7 @@ export function UsersScreen({ user }: UsersScreenProps) {
             headerEyebrow="Platform"
             title="Team members"
             description="Owner can manage all administrative data. Manager and Staff have scoped access."
-            icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={UserMultiple02Icon} strokeWidth={1.5} />}
+            icon={UserMultiple02Icon}
           >
             {users.isLoading ? (
               <LoadingState label="Loading users..." surface="plain" />

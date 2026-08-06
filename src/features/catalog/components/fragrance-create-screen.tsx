@@ -1,14 +1,14 @@
 "use client"
 
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { ArrowLeft02Icon, PerfumeIcon, PlusSignIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 
+import { IconLink } from "@/components/common/icon-link"
 import { AdminShell } from "@/components/layouts/admin-shell"
-import { Inspector, PageWrapper, SectionWrapper } from "@/components/layouts/page"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Heading, Inspector, PageWrapper, SectionWrapper } from "@/components/layouts/page"
+import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/toast"
 import { FormInput } from "@/components/forms/form-input"
 import { FormSelect } from "@/components/forms/form-select"
@@ -96,10 +96,9 @@ export function FragranceCreateScreen({ user }: FragranceCreateScreenProps) {
   }
 
   const backAction = (
-    <Link className={buttonVariants({ variant: "outline" })} href="/admin/fragrances">
-      <HugeiconsIcon aria-hidden="true" data-icon="inline-start" icon={ArrowLeft02Icon} strokeWidth={1.5} />
+    <IconLink href="/admin/fragrances" icon={ArrowLeft02Icon}>
       Back to fragrances
-    </Link>
+    </IconLink>
   )
 
   return (
@@ -114,7 +113,7 @@ export function FragranceCreateScreen({ user }: FragranceCreateScreenProps) {
           <SectionWrapper
             headerEyebrow="Catalog record"
             title="Fragrance details"
-            icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={PerfumeIcon} strokeWidth={1.5} />}
+            icon={PerfumeIcon}
           >
             <form className="grid gap-4" onSubmit={fragranceForm.handleSubmit(submitFragrance)}>
               <FormSelect
@@ -165,8 +164,7 @@ export function FragranceCreateScreen({ user }: FragranceCreateScreenProps) {
 
           <Inspector>
             <div className="px-3 pb-3 pt-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-admin-champagne">Brand</p>
-              <h2 className="mt-1 text-lg font-semibold">Create brand</h2>
+              <Heading size="section" eyebrow="Brand" title="Create brand" />
             </div>
             <div className="flex flex-1 flex-col rounded-xl bg-background p-4 md:p-5">
               <form className="grid gap-4" onSubmit={brandForm.handleSubmit(submitBrand)}>

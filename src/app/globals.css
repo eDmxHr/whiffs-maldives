@@ -39,6 +39,7 @@
     --admin-warning: oklch(0.72 0.13 76);
     --admin-danger: oklch(0.56 0.18 28);
     --admin-info: oklch(0.62 0.09 224);
+    --admin-champagne-deep: color-mix(in oklch, var(--admin-champagne), var(--admin-ink) 45%);
     --sidebar: oklch(0.24 0.05 166);
     --sidebar-foreground: oklch(0.972 0.012 88);
     --sidebar-primary: oklch(0.73 0.095 78);
@@ -127,6 +128,10 @@
     --color-admin-warning: var(--admin-warning);
     --color-admin-danger: var(--admin-danger);
     --color-admin-info: var(--admin-info);
+    --color-admin-champagne-deep: var(--admin-champagne-deep);
+    --tracking-wide: 0.16em;
+    --tracking-wider: 0.18em;
+    --tracking-widest: 0.24em;
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);

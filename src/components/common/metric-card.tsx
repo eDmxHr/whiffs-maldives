@@ -24,7 +24,7 @@ export function MetricCard({ label, value, detail, icon, tone = "default", class
       <div className="flex flex-1 flex-col rounded-xl bg-background p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
             <div className="mt-2 text-2xl font-semibold text-foreground">{value}</div>
           </div>
           {icon ? (

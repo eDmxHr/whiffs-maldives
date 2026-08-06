@@ -129,7 +129,7 @@ export function FragranceEditScreen({ user, fragranceId }: FragranceEditScreenPr
           <SectionWrapper
             headerEyebrow="Catalog record"
             title="Fragrance details"
-            icon={<HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={PerfumeIcon} strokeWidth={1.5} />}
+            icon={PerfumeIcon}
           >
             <form className="grid gap-4" onSubmit={form.handleSubmit(submit)}>
               <FormSelect
