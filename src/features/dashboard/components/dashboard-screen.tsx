@@ -9,8 +9,6 @@ import {
   Invoice03Icon,
   MilkBottleIcon,
   Package02Icon,
-  PerfumeIcon,
-  UserGroup02Icon,
 } from "@hugeicons/core-free-icons"
 import {
   BarElement,
@@ -38,11 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  useBottles,
-  useFragrances,
-  useSuppliers,
-} from "@/features/catalog/hooks/use-catalog"
+import { useBottles, useFragrances } from "@/features/catalog/hooks/use-catalog"
 import { orderStatusConfig } from "@/features/orders/components/orders-screen"
 import { useOrders } from "@/features/orders/hooks/use-orders"
 import { usePackagingItems } from "@/features/packaging/hooks/use-packaging"
@@ -67,7 +61,6 @@ const inboxCategoryConfig: StatusBadgeConfig = {
 export function DashboardScreen({ user }: DashboardScreenProps) {
   const fragrances = useFragrances()
   const bottles = useBottles()
-  const suppliers = useSuppliers()
   const orders = useOrders()
   const packagingItems = usePackagingItems()
 
@@ -79,9 +72,6 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
     [packagingItems.data]
   )
 
-  const draftCount =
-    fragrances.data?.filter((fragrance) => fragrance.status === "draft")
-      .length ?? 0
   const availableBottleCount =
     bottles.data?.filter((bottle) => bottle.status === "available").length ?? 0
   const lowVolumeBottles = useMemo(
@@ -101,15 +91,9 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
     const ordersThisMonth = allOrders.filter(
       (order) => new Date(order.createdAt) >= startOfMonth
     )
-    const paidOrders = allOrders.filter(
-      (order) => order.paymentStatus === "paid"
-    )
     const revenueThisMonth = ordersThisMonth
       .filter((order) => order.paymentStatus === "paid")
       .reduce((sum, order) => sum + order.total, 0)
-    const averageOrderValue = paidOrders.length
-      ? paidOrders.reduce((sum, o) => sum + o.total, 0) / paidOrders.length
-      : 0
     const pendingPaymentsCount = allOrders.filter(
       (order) => order.paymentStatus === "pending"
     ).length
@@ -117,7 +101,6 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
     return {
       ordersTodayCount: ordersToday.length,
       revenueThisMonth,
-      averageOrderValue,
       pendingPaymentsCount,
     }
   }, [orders.data])
@@ -208,12 +191,6 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
               tone="success"
             />
             <MetricCard
-              label="Average order value"
-              value={money(metrics.averageOrderValue)}
-              detail="Across paid orders"
-              icon={Invoice03Icon}
-            />
-            <MetricCard
               label="Pending payments"
               value={String(metrics.pendingPaymentsCount)}
               detail="Awaiting verification"
@@ -221,23 +198,11 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
               tone="warning"
             />
             <MetricCard
-              label="Fragrances"
-              value={String(fragrances.data?.length ?? 0)}
-              detail={`${draftCount} draft records`}
-              icon={PerfumeIcon}
-            />
-            <MetricCard
               label="Available bottles"
               value={String(availableBottleCount)}
               detail="Ready for allocation"
               icon={MilkBottleIcon}
               tone="success"
-            />
-            <MetricCard
-              label="Suppliers"
-              value={String(suppliers.data?.length ?? 0)}
-              detail="Trusted sources on file"
-              icon={UserGroup02Icon}
             />
           </div>
 
