@@ -172,7 +172,7 @@ export function SectionWrapper({
           />
         </div>
       ) : null}
-      <div className="flex flex-1 flex-col rounded-xl bg-background p-4 md:p-5">
+      <div className="flex min-w-0 flex-1 flex-col rounded-xl bg-background p-4 md:p-5">
         {children}
       </div>
     </section>

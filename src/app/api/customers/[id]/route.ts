@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth"
 import { fail, ok } from "@/lib/api-response"
-import { demoStore } from "@/lib/demo-store"
+import { createClient } from "@/lib/supabase/server"
+import { fetchCustomerDetail } from "@/lib/supabase/orders-repository"
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin()
@@ -10,7 +11,8 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   }
 
   const { id } = await context.params
-  const customer = demoStore.getCustomer(id)
+  const supabase = await createClient()
+  const customer = await fetchCustomerDetail(supabase, id)
 
   if (!customer) {
     return fail("NOT_FOUND", "Customer was not found.", 404)

@@ -64,7 +64,7 @@ export function ReportsScreen({ user }: ReportsScreenProps) {
         {isLoading ? (
           <LoadingState label="Loading reports..." />
         ) : (
-          <div className="grid gap-5">
+          <div className="grid grid-cols-1 gap-5">
             <SectionWrapper
               title="Sales over time"
               description="Revenue from paid orders over the last 30 days."

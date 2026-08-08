@@ -105,7 +105,7 @@ export function FragranceDetailScreen({
         {fragrance.isLoading ? (
           <LoadingState label="Loading fragrance..." />
         ) : fragrance.data ? (
-          <div className="grid gap-5">
+          <div className="grid grid-cols-1 gap-5">
             <SectionWrapper
               headerEyebrow="Catalog"
               title="Fragrance detail"

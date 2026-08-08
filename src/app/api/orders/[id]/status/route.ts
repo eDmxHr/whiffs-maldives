@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth"
 import { fail, ok } from "@/lib/api-response"
-import { demoStore } from "@/lib/demo-store"
+import { createClient } from "@/lib/supabase/server"
+import { fetchOrderView, updateOrderStatusRpc } from "@/lib/supabase/orders-repository"
 import { updateOrderStatusSchema } from "@/features/orders/schemas/orders"
 
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
@@ -17,15 +18,26 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     return fail("VALIDATION_ERROR", "Order status is invalid.", 422, parsed.error.flatten().fieldErrors)
   }
 
-  const result = demoStore.updateOrderStatus(id, parsed.data.status)
+  const supabase = await createClient()
+  const { data, error } = await updateOrderStatusRpc(supabase, id, parsed.data.status)
 
-  if ("error" in result) {
-    if (result.error === "NOT_FOUND") {
+  if (error || !data) {
+    if (error?.message?.includes("FORBIDDEN")) {
+      return fail("UNAUTHORIZED", "Sign in with an owner account to update orders.", 401)
+    }
+
+    if (error?.message?.includes("NOT_FOUND")) {
       return fail("NOT_FOUND", "Order was not found.", 404)
     }
 
     return fail("INVALID_STATUS_TRANSITION", "Order cannot move to that status from its current status.", 422)
   }
 
-  return ok(result.data)
+  const order = await fetchOrderView(supabase, id)
+
+  if (!order) {
+    return fail("NOT_FOUND", "Order was not found.", 404)
+  }
+
+  return ok(order)
 }

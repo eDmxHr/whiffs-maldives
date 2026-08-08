@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-import { getUsers, updateUserRole } from "@/features/users/api/users"
+import { getUsers, inviteUser, updateUserRole, type InviteUserInput } from "@/features/users/api/users"
 import type { AdminUser } from "@/types/users"
 
 export const userKeys = {
@@ -19,6 +19,12 @@ export function useUserMutations() {
   return {
     updateRole: useMutation({
       mutationFn: ({ id, role }: { id: string; role: AdminUser["role"] }) => updateUserRole(id, role),
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: userKeys.users })
+      },
+    }),
+    inviteUser: useMutation({
+      mutationFn: (input: InviteUserInput) => inviteUser(input),
       onSuccess: () => {
         void queryClient.invalidateQueries({ queryKey: userKeys.users })
       },

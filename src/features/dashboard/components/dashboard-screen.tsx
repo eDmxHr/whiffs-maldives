@@ -67,7 +67,7 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
   const lowStockPackaging = useMemo(
     () =>
       (packagingItems.data ?? []).filter(
-        (item) => item.quantity <= item.minimumQuantity
+        (item) => item.isActive && item.quantity <= item.minimumQuantity
       ),
     [packagingItems.data]
   )
@@ -174,7 +174,7 @@ export function DashboardScreen({ user }: DashboardScreenProps) {
   return (
     <AdminShell brand="Whiffs Maldives" user={user}>
       <PageWrapper>
-        <div className="grid gap-5">
+        <div className="grid grid-cols-1 gap-5">
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-4">
             <MetricCard
               label="Orders today"

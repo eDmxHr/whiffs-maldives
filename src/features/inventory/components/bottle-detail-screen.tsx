@@ -145,7 +145,7 @@ export function BottleDetailScreen({
         {bottle.isLoading ? (
           <LoadingState label="Loading bottle..." />
         ) : bottle.data ? (
-          <div className="grid gap-5">
+          <div className="grid grid-cols-1 gap-5">
             <SectionWrapper
               headerEyebrow="Inventory"
               title="Bottle detail"

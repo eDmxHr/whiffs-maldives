@@ -176,7 +176,7 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
         {order.isLoading ? (
           <LoadingState label="Loading order..." />
         ) : selectedOrder ? (
-          <div className="grid gap-5">
+          <div className="grid grid-cols-1 gap-5">
             {error ? <InlineError>{error}</InlineError> : null}
 
             <SectionWrapper

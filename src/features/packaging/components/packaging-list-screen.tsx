@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Package02Icon, PlusSignIcon } from "@hugeicons/core-free-icons"
+import { MoreHorizontalIcon, Package02Icon, PlusSignIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 
 import { EmptyState } from "@/components/common/empty-state"
@@ -10,7 +10,13 @@ import { SearchInput } from "@/components/common/search-input"
 import { StatusBadge, type StatusBadgeConfig } from "@/components/common/status-badge"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { PageWrapper, SectionWrapper, Toolbar } from "@/components/layouts/page"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -28,6 +34,7 @@ import type { PackagingItem } from "@/types/packaging"
 const stockStatusConfig: StatusBadgeConfig = {
   low: { label: "Low stock", variant: "warning" },
   ok: { label: "In stock", variant: "success" },
+  archived: { label: "Archived", variant: "neutral" },
 }
 
 type PackagingListScreenProps = {
@@ -41,7 +48,9 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
   const mutations = usePackagingMutations()
   const [searchQuery, setSearchQuery] = useState("")
   const [lowStockOnly, setLowStockOnly] = useState(false)
-  const [rowEdits, setRowEdits] = useState<Record<string, { quantity: string; unitCost: string; minimumQuantity: string }>>({})
+  const [rowEdits, setRowEdits] = useState<
+    Record<string, { name: string; unit: string; quantity: string; unitCost: string; minimumQuantity: string }>
+  >({})
   const [error, setError] = useState("")
   const [newItem, setNewItem] = useState<NewItemForm>({ name: "", unit: "", unitCost: "", quantity: "", minimumQuantity: "" })
 
@@ -49,20 +58,24 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
     const query = searchQuery.trim().toLowerCase()
 
     return (items.data ?? []).filter((item) => {
-      const isLow = item.quantity <= item.minimumQuantity
+      const isLow = item.isActive && item.quantity <= item.minimumQuantity
       const matchesStock = !lowStockOnly || isLow
       return matchesStock && (!query || item.name.toLowerCase().includes(query))
     })
   }, [items.data, searchQuery, lowStockOnly])
 
-  function editValue(item: PackagingItem, field: "quantity" | "unitCost" | "minimumQuantity") {
+  type EditableField = "name" | "unit" | "quantity" | "unitCost" | "minimumQuantity"
+
+  function editValue(item: PackagingItem, field: EditableField) {
     return rowEdits[item.id]?.[field] ?? String(item[field])
   }
 
-  function setEditValue(item: PackagingItem, field: "quantity" | "unitCost" | "minimumQuantity", value: string) {
+  function setEditValue(item: PackagingItem, field: EditableField, value: string) {
     setRowEdits((current) => ({
       ...current,
       [item.id]: {
+        name: current[item.id]?.name ?? item.name,
+        unit: current[item.id]?.unit ?? item.unit,
         quantity: current[item.id]?.quantity ?? String(item.quantity),
         unitCost: current[item.id]?.unitCost ?? String(item.unitCost),
         minimumQuantity: current[item.id]?.minimumQuantity ?? String(item.minimumQuantity),
@@ -79,10 +92,17 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
       return
     }
 
+    if (!edit.name.trim() || !edit.unit.trim()) {
+      setError("Name and unit cannot be empty.")
+      return
+    }
+
     try {
       await mutations.updatePackagingItem.mutateAsync({
         id: item.id,
         input: {
+          name: edit.name.trim(),
+          unit: edit.unit.trim(),
           quantity: Number(edit.quantity),
           unitCost: Number(edit.unitCost),
           minimumQuantity: Number(edit.minimumQuantity),
@@ -96,6 +116,28 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
       toast.add({ title: `${item.name} updated.`, type: "success" })
     } catch {
       setError(`Could not update ${item.name}.`)
+    }
+  }
+
+  async function archiveItem(item: PackagingItem) {
+    setError("")
+
+    try {
+      await mutations.archivePackagingItem.mutateAsync(item.id)
+      toast.add({ title: `${item.name} archived.`, type: "success" })
+    } catch {
+      setError(`Could not archive ${item.name}.`)
+    }
+  }
+
+  async function restoreItem(item: PackagingItem) {
+    setError("")
+
+    try {
+      await mutations.restorePackagingItem.mutateAsync(item.id)
+      toast.add({ title: `${item.name} restored.`, type: "success" })
+    } catch {
+      setError(`Could not restore ${item.name}.`)
     }
   }
 
@@ -125,7 +167,7 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
   return (
     <AdminShell brand="Whiffs Maldives" user={user}>
       <PageWrapper breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Packaging" }]} title="Packaging">
-        <div className="grid gap-5">
+        <div className="grid grid-cols-1 gap-5">
           <Toolbar>
             <SearchInput
               className="min-w-0"
@@ -171,16 +213,32 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
                     {visibleItems.map((item) => {
                       const isLow = item.quantity <= item.minimumQuantity
                       const dirty = Boolean(rowEdits[item.id])
+                      const status = !item.isActive ? "archived" : isLow ? "low" : "ok"
 
                       return (
                         <TableRow key={item.id}>
-                          <TableCell className="px-4 font-semibold text-foreground">{item.name}</TableCell>
-                          <TableCell className="text-muted-foreground">{item.unit}</TableCell>
+                          <TableCell className="px-4">
+                            <Input
+                              className="h-9 w-36 font-semibold text-foreground"
+                              disabled={!item.isActive}
+                              value={editValue(item, "name")}
+                              onChange={(event) => setEditValue(item, "name", event.target.value)}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              className="h-9 w-24"
+                              disabled={!item.isActive}
+                              value={editValue(item, "unit")}
+                              onChange={(event) => setEditValue(item, "unit", event.target.value)}
+                            />
+                          </TableCell>
                           <TableCell>
                             <Input
                               className="h-9 w-24"
                               type="number"
                               min={0}
+                              disabled={!item.isActive}
                               value={editValue(item, "unitCost")}
                               onChange={(event) => setEditValue(item, "unitCost", event.target.value)}
                             />
@@ -190,6 +248,7 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
                               className="h-9 w-24"
                               type="number"
                               min={0}
+                              disabled={!item.isActive}
                               value={editValue(item, "quantity")}
                               onChange={(event) => setEditValue(item, "quantity", event.target.value)}
                             />
@@ -199,24 +258,49 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
                               className="h-9 w-24"
                               type="number"
                               min={0}
+                              disabled={!item.isActive}
                               value={editValue(item, "minimumQuantity")}
                               onChange={(event) => setEditValue(item, "minimumQuantity", event.target.value)}
                             />
                           </TableCell>
                           <TableCell>
-                            <StatusBadge status={isLow ? "low" : "ok"} config={stockStatusConfig} />
+                            <StatusBadge status={status} config={stockStatusConfig} />
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              disabled={!dirty}
-                              loading={mutations.updatePackagingItem.isPending}
-                              loadingText="Saving..."
-                              onClick={() => saveRow(item)}
-                            >
-                              Save
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger
+                                className={buttonVariants({ variant: "outline", size: "icon-sm" })}
+                                aria-label={`Actions for ${item.name}`}
+                              >
+                                <HugeiconsIcon aria-hidden="true" icon={MoreHorizontalIcon} strokeWidth={1.5} />
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                {item.isActive ? (
+                                  <>
+                                    <DropdownMenuItem
+                                      disabled={!dirty || mutations.updatePackagingItem.isPending}
+                                      onClick={() => saveRow(item)}
+                                    >
+                                      Save changes
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      variant="destructive"
+                                      disabled={mutations.archivePackagingItem.isPending}
+                                      onClick={() => archiveItem(item)}
+                                    >
+                                      Archive
+                                    </DropdownMenuItem>
+                                  </>
+                                ) : (
+                                  <DropdownMenuItem
+                                    disabled={mutations.restorePackagingItem.isPending}
+                                    onClick={() => restoreItem(item)}
+                                  >
+                                    Restore
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </TableCell>
                         </TableRow>
                       )

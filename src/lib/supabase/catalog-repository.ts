@@ -12,6 +12,8 @@ import type {
   Offering,
   Supplier,
 } from "@/types/catalog"
+import type { PackagingItem } from "@/types/packaging"
+import type { AdminUser } from "@/types/users"
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -76,6 +78,36 @@ export function mapBottle(row: Record<string, unknown>): Bottle {
     receivedAt: row.received_at as string,
     status: row.status as Bottle["status"],
     notes: (row.notes as string) ?? "",
+  }
+}
+
+export function mapPackagingItem(row: Record<string, unknown>): PackagingItem {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    unit: row.unit as string,
+    unitCost: Number(row.unit_cost),
+    quantity: Number(row.quantity),
+    minimumQuantity: Number(row.minimum_quantity),
+    isActive: row.is_active as boolean,
+  }
+}
+
+// row is a `profiles` row with a nested `user_roles(role:roles(name))` select. Returns null for
+// any profile with no assigned role, mirroring how get_my_context() treats an unassigned user as
+// having no session -- the route filters these out rather than guessing a default role.
+export function mapAdminUser(row: Record<string, unknown>): AdminUser | null {
+  const userRoles = (row.user_roles as Array<{ role: { name: string } | null } | null> | null) ?? []
+  const roleName = userRoles[0]?.role?.name
+
+  if (!roleName) {
+    return null
+  }
+
+  return {
+    id: row.id as string,
+    name: (row.name as string) ?? "",
+    role: roleName as AdminUser["role"],
   }
 }
 

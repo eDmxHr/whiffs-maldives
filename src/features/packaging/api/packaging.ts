@@ -18,3 +18,13 @@ export async function updatePackagingItem(id: string, input: Partial<PackagingIt
   const { data } = await apiClient.patch<ApiSuccess<PackagingItem>>(`/packaging-items/${id}`, input)
   return data.data
 }
+
+export async function archivePackagingItem(id: string) {
+  const { data } = await apiClient.post<ApiSuccess<PackagingItem>>(`/packaging-items/${id}/archive`)
+  return data.data
+}
+
+export async function restorePackagingItem(id: string) {
+  const { data } = await apiClient.post<ApiSuccess<PackagingItem>>(`/packaging-items/${id}/restore`)
+  return data.data
+}

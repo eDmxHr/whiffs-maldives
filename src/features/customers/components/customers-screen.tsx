@@ -45,7 +45,7 @@ export function CustomersScreen({ user }: CustomersScreenProps) {
   return (
     <AdminShell brand="Whiffs Maldives" user={user}>
       <PageWrapper breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Customers" }]} title="Customers">
-        <div className="grid gap-5">
+        <div className="grid grid-cols-1 gap-5">
           <Toolbar>
             <SearchInput
               placeholder="Search by name, phone, or email"

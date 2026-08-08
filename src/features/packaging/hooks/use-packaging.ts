@@ -3,8 +3,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import {
+  archivePackagingItem,
   createPackagingItem,
   getPackagingItems,
+  restorePackagingItem,
   updatePackagingItem,
   type PackagingItemInput,
 } from "@/features/packaging/api/packaging"
@@ -27,6 +29,14 @@ export function usePackagingMutations() {
     createPackagingItem: useMutation({ mutationFn: createPackagingItem, onSuccess: refresh }),
     updatePackagingItem: useMutation({
       mutationFn: ({ id, input }: { id: string; input: Partial<PackagingItemInput> }) => updatePackagingItem(id, input),
+      onSuccess: refresh,
+    }),
+    archivePackagingItem: useMutation({
+      mutationFn: (id: string) => archivePackagingItem(id),
+      onSuccess: refresh,
+    }),
+    restorePackagingItem: useMutation({
+      mutationFn: (id: string) => restorePackagingItem(id),
       onSuccess: refresh,
     }),
   }

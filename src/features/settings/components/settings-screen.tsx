@@ -102,7 +102,7 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
         title="Settings"
         description="Business-wide defaults used across inventory, pricing, and order workflows."
       >
-        <div className="grid gap-5">
+        <div className="grid grid-cols-1 gap-5">
           {settings.isLoading ? (
             <LoadingState label="Loading settings..." />
           ) : (

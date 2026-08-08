@@ -122,7 +122,7 @@ export function FragranceScreen({ user }: FragranceScreenProps) {
         title="Fragrances"
         actions={addFragranceAction}
       >
-        <div className="grid gap-5">
+        <div className="grid grid-cols-1 gap-5">
           <Toolbar>
             <SearchInput
               className="min-w-0"

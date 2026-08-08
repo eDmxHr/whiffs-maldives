@@ -2,8 +2,22 @@ import { apiClient } from "@/lib/api-client"
 import type { ApiCollection, ApiSuccess } from "@/types/api"
 import type { Order, OrderStatus } from "@/types/orders"
 
+export interface CreateOrderInput {
+  customerId: string
+  deliveryMethod: string
+  deliveryAddress?: string
+  notes?: string
+  deliveryFee?: number
+  items: Array<{ fragranceId: string; offeringId: string; quantity: number }>
+}
+
 export async function getOrders() {
   const { data } = await apiClient.get<ApiCollection<Order>>("/orders")
+  return data.data
+}
+
+export async function createOrder(input: CreateOrderInput) {
+  const { data } = await apiClient.post<ApiSuccess<Order>>("/orders", input)
   return data.data
 }
 

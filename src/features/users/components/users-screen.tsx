@@ -60,7 +60,7 @@ export function UsersScreen({ user }: UsersScreenProps) {
   return (
     <AdminShell brand="Whiffs Maldives" user={user}>
       <PageWrapper breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Users" }]} title="Users">
-        <div className="grid gap-5">
+        <div className="grid grid-cols-1 gap-5">
           {error ? (
             <div className="rounded-xl bg-admin-danger/12 px-4 py-3 text-sm font-medium text-admin-danger">{error}</div>
           ) : null}

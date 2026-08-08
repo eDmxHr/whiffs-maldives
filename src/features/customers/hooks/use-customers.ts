@@ -1,8 +1,13 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-import { getCustomer, getCustomers } from "@/features/customers/api/customers"
+import {
+  createCustomer,
+  getCustomer,
+  getCustomers,
+  type CreateCustomerInput,
+} from "@/features/customers/api/customers"
 
 export const customerKeys = {
   customers: ["customers"] as const,
@@ -15,4 +20,17 @@ export function useCustomers() {
 
 export function useCustomer(id: string) {
   return useQuery({ queryKey: customerKeys.customer(id), queryFn: () => getCustomer(id), enabled: Boolean(id) })
+}
+
+export function useCustomerMutations() {
+  const queryClient = useQueryClient()
+
+  return {
+    createCustomer: useMutation({
+      mutationFn: (input: CreateCustomerInput) => createCustomer(input),
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: customerKeys.customers })
+      },
+    }),
+  }
 }

@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth"
 import { fail, ok } from "@/lib/api-response"
-import { demoStore } from "@/lib/demo-store"
+import { createClient } from "@/lib/supabase/server"
+import { fetchOrderView } from "@/lib/supabase/orders-repository"
 import { paymentProofSchema } from "@/features/orders/schemas/orders"
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
@@ -17,7 +18,17 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     return fail("VALIDATION_ERROR", "Payment proof is invalid.", 422, parsed.error.flatten().fieldErrors)
   }
 
-  const order = demoStore.setOrderPaymentProof(id, parsed.data.publicUrl)
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("orders")
+    .update({ payment_proof_url: parsed.data.publicUrl })
+    .eq("id", id)
+
+  if (error) {
+    return fail("NOT_FOUND", "Order was not found.", 404)
+  }
+
+  const order = await fetchOrderView(supabase, id)
 
   if (!order) {
     return fail("NOT_FOUND", "Order was not found.", 404)

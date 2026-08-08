@@ -97,7 +97,7 @@ export function OrdersScreen({ user }: OrdersScreenProps) {
         breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Orders" }]}
         title="Orders"
       >
-        <div className="grid gap-5">
+        <div className="grid grid-cols-1 gap-5">
           <Toolbar>
             <SearchInput
               className="min-w-0"
