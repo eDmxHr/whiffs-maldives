@@ -7,7 +7,6 @@ const footerColumns = [
     heading: "Shop",
     links: [
       { label: "Fragrances", href: "/fragrances" },
-      { label: "Brands", href: "/brands" },
       { label: "Your cart", href: "/cart" },
     ],
   },
