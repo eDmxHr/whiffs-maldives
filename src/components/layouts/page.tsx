@@ -165,7 +165,12 @@ export function SectionWrapper({
             description={description}
             icon={
               icon ? (
-                <HugeiconsIcon aria-hidden="true" className="size-5 text-admin-reef" icon={icon} strokeWidth={1.5} />
+                <HugeiconsIcon
+                  aria-hidden="true"
+                  className="size-5 text-admin-reef"
+                  icon={icon}
+                  strokeWidth={1.5}
+                />
               ) : null
             }
             actions={actions}

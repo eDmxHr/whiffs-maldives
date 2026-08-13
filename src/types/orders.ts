@@ -8,6 +8,8 @@ export type OrderStatus =
 
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded"
 
+export type PaymentMethod = "bank_transfer" | "cod"
+
 export interface OrderItem {
   id: string
   fragranceId: string
@@ -35,6 +37,8 @@ export interface Order {
   customerPhone: string
   status: OrderStatus
   paymentStatus: PaymentStatus
+  paymentMethod: PaymentMethod
+  paymentExpiresAt: string | null
   items: OrderItem[]
   subtotal: number
   deliveryFee: number
@@ -46,4 +50,22 @@ export interface Order {
   fulfillmentChecklist: FulfillmentChecklistItem[]
   createdAt: string
   updatedAt: string
+}
+
+// What create_guest_order's `returns public.orders` gives an anonymous caller directly --
+// RLS blocks a follow-up select (orders.view is staff-only), so this is deliberately lighter
+// than Order: no joined customer/items, since the checkout UI already has those client-side.
+export interface GuestOrderConfirmation {
+  id: string
+  orderNumber: string
+  status: OrderStatus
+  paymentStatus: PaymentStatus
+  paymentMethod: PaymentMethod
+  paymentExpiresAt: string | null
+  subtotal: number
+  deliveryFee: number
+  total: number
+  deliveryMethod: string
+  deliveryAddress: string
+  createdAt: string
 }

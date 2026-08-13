@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/api-client"
 import type { ApiCollection, ApiSuccess } from "@/types/api"
-import type { Order, OrderStatus } from "@/types/orders"
+import type { Order, OrderStatus, PaymentMethod } from "@/types/orders"
 
 export interface CreateOrderInput {
   customerId: string
@@ -9,6 +9,7 @@ export interface CreateOrderInput {
   notes?: string
   deliveryFee?: number
   items: Array<{ fragranceId: string; offeringId: string; quantity: number }>
+  paymentMethod?: PaymentMethod
 }
 
 export async function getOrders() {

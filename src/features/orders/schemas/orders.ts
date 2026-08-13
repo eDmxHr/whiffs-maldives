@@ -6,6 +6,8 @@ export const createOrderItemSchema = z.object({
   quantity: z.number().int().positive(),
 })
 
+export const paymentMethodSchema = z.enum(["bank_transfer", "cod"])
+
 export const createOrderSchema = z.object({
   customerId: z.string().uuid(),
   deliveryMethod: z.string().min(1),
@@ -13,6 +15,7 @@ export const createOrderSchema = z.object({
   notes: z.string().default(""),
   deliveryFee: z.number().nonnegative().default(0),
   items: z.array(createOrderItemSchema).min(1),
+  paymentMethod: paymentMethodSchema.default("bank_transfer"),
 })
 
 export const updateOrderStatusSchema = z.object({

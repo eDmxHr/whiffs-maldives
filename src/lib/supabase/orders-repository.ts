@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 import type { CustomerDetail, CustomerView } from "@/types/customers"
-import type { FulfillmentChecklistItem, Order, OrderItem, OrderStatus } from "@/types/orders"
+import type { FulfillmentChecklistItem, GuestOrderConfirmation, Order, OrderItem, OrderStatus } from "@/types/orders"
 
 export function mapCustomer(row: Record<string, unknown>) {
   return {
@@ -101,6 +101,8 @@ function mapOrderRow(row: any): Order {
     customerPhone: (customer.phone as string) ?? "",
     status: row.status as OrderStatus,
     paymentStatus: row.payment_status,
+    paymentMethod: row.payment_method as Order["paymentMethod"],
+    paymentExpiresAt: (row.payment_expires_at as string) ?? null,
     items: (row.items ?? []).map(mapOrderItem),
     subtotal: Number(row.subtotal),
     deliveryFee: Number(row.delivery_fee),
@@ -164,6 +166,7 @@ export async function createOrderRpc(
     notes: string
     deliveryFee: number
     items: CreateOrderItemInput[]
+    paymentMethod?: string
   }
 ) {
   return supabase.rpc("create_order", {
@@ -177,7 +180,55 @@ export async function createOrderRpc(
       offeringId: item.offeringId,
       quantity: item.quantity,
     })),
+    p_payment_method: input.paymentMethod ?? "bank_transfer",
   })
+}
+
+export async function createGuestOrderRpc(
+  supabase: SupabaseClient,
+  input: {
+    customerName: string
+    customerPhone: string
+    customerEmail: string
+    deliveryMethod: string
+    deliveryAddress: string
+    notes: string
+    paymentMethod: string
+    items: CreateOrderItemInput[]
+  }
+) {
+  return supabase.rpc("create_guest_order", {
+    p_customer_name: input.customerName,
+    p_customer_phone: input.customerPhone,
+    p_customer_email: input.customerEmail,
+    p_delivery_method: input.deliveryMethod,
+    p_delivery_address: input.deliveryAddress,
+    p_notes: input.notes,
+    p_payment_method: input.paymentMethod,
+    p_items: input.items.map((item) => ({
+      fragranceId: item.fragranceId,
+      offeringId: item.offeringId,
+      quantity: item.quantity,
+    })),
+  })
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function mapGuestOrderRow(row: any): GuestOrderConfirmation {
+  return {
+    id: row.id as string,
+    orderNumber: row.order_number as string,
+    status: row.status as OrderStatus,
+    paymentStatus: row.payment_status,
+    paymentMethod: row.payment_method,
+    paymentExpiresAt: (row.payment_expires_at as string) ?? null,
+    subtotal: Number(row.subtotal),
+    deliveryFee: Number(row.delivery_fee),
+    total: Number(row.total),
+    deliveryMethod: (row.delivery_method as string) ?? "",
+    deliveryAddress: (row.delivery_address as string) ?? "",
+    createdAt: row.created_at as string,
+  }
 }
 
 export async function updateOrderStatusRpc(supabase: SupabaseClient, orderId: string, status: OrderStatus) {
