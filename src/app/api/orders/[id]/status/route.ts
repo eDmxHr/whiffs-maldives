@@ -30,6 +30,14 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       return fail("NOT_FOUND", "Order was not found.", 404)
     }
 
+    if (error?.message?.includes("INSUFFICIENT_STOCK")) {
+      return fail(
+        "INSUFFICIENT_STOCK",
+        "Not enough available bottle volume for one or more items — check inventory before confirming payment.",
+        409
+      )
+    }
+
     return fail("INVALID_STATUS_TRANSITION", "Order cannot move to that status from its current status.", 422)
   }
 

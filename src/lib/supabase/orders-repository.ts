@@ -70,6 +70,7 @@ function mapOrderItem(row: Record<string, unknown>): OrderItem {
     unitPrice: Number(row.unit_price),
     totalPrice: Number(row.total_price),
     fulfilledQuantity: Number(row.fulfilled_quantity),
+    bottleId: (row.bottle_id as string | null) ?? null,
   }
 }
 

@@ -21,6 +21,8 @@ export interface OrderItem {
   unitPrice: number
   totalPrice: number
   fulfilledQuantity: number
+  /** The bottle committed to this line item at payment confirmation, or null before that / after cancellation releases it. */
+  bottleId: string | null
 }
 
 export interface FulfillmentChecklistItem {

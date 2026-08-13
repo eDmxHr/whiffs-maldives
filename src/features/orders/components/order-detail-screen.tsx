@@ -107,6 +107,22 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
     }
   }
 
+  async function changeStatus(nextStatus: OrderStatus) {
+    if (!selectedOrder) return
+    setError("")
+
+    try {
+      await mutations.updateStatus.mutateAsync({
+        id: selectedOrder.id,
+        status: nextStatus,
+      })
+    } catch (mutationError) {
+      setError(
+        mutationErrorMessage(mutationError, "Could not update order status.")
+      )
+    }
+  }
+
   async function toggleChecklistItem(checklistItemId: string) {
     if (!selectedOrder) return
     setError("")
@@ -216,12 +232,7 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
                             size="sm"
                             variant={action.variant}
                             loading={mutations.updateStatus.isPending}
-                            onClick={() =>
-                              mutations.updateStatus.mutate({
-                                id: selectedOrder.id,
-                                status: action.nextStatus,
-                              })
-                            }
+                            onClick={() => changeStatus(action.nextStatus)}
                           >
                             <HugeiconsIcon
                               aria-hidden="true"
@@ -295,13 +306,16 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
 
                 {showBottleAllocation ? (
                   <div className="py-5">
-                    <FieldLabel>Bottle allocation preview</FieldLabel>
+                    <FieldLabel>Bottle allocation</FieldLabel>
                     <div className="mt-3 grid gap-2">
                       {selectedOrder.items.map((item) => {
-                        const bottle = earliestAvailableBottle(
-                          bottles.data ?? [],
-                          item.fragranceId
-                        )
+                        const committedBottle = item.bottleId
+                          ? bottles.data?.find((bottle) => bottle.id === item.bottleId)
+                          : undefined
+                        const previewBottle = !item.bottleId
+                          ? earliestAvailableBottle(bottles.data ?? [], item.fragranceId)
+                          : undefined
+
                         return (
                           <div
                             key={item.id}
@@ -311,9 +325,11 @@ export function OrderDetailScreen({ user, orderId }: OrderDetailScreenProps) {
                               {item.offeringName}
                             </span>
                             <span className="text-muted-foreground">
-                              {bottle
-                                ? `Bottle ${bottle.id.slice(-4)} · ${bottle.remainingVolumeMl}ml left`
-                                : "No bottle available"}
+                              {committedBottle
+                                ? `Bottle ${committedBottle.id.slice(-4)} · ${committedBottle.remainingVolumeMl}ml left (committed)`
+                                : previewBottle
+                                  ? `Bottle ${previewBottle.id.slice(-4)} · ${previewBottle.remainingVolumeMl}ml left (not yet committed)`
+                                  : "No bottle available"}
                             </span>
                           </div>
                         )

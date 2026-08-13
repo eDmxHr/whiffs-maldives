@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -29,7 +30,15 @@ import {
 } from "@/components/ui/table"
 import { toast } from "@/components/ui/toast"
 import { usePackagingItems, usePackagingMutations } from "@/features/packaging/hooks/use-packaging"
+import { DEFAULT_DECANT_SIZES } from "@/lib/pricing"
 import type { PackagingItem } from "@/types/packaging"
+
+const SHARED_SIZE_VALUE = "shared"
+
+const decantSizeOptions = [
+  { label: "All sizes", value: SHARED_SIZE_VALUE },
+  ...DEFAULT_DECANT_SIZES.map((size) => ({ label: `${size}ml`, value: String(size) })),
+]
 
 const stockStatusConfig: StatusBadgeConfig = {
   low: { label: "Low stock", variant: "warning" },
@@ -41,18 +50,32 @@ type PackagingListScreenProps = {
   user: { name: string; role: string }
 }
 
-type NewItemForm = { name: string; unit: string; unitCost: string; quantity: string; minimumQuantity: string }
+type NewItemForm = {
+  name: string
+  unit: string
+  unitCost: string
+  quantity: string
+  minimumQuantity: string
+  decantSizeMl: string
+}
+
+type RowEdit = { name: string; unit: string; quantity: string; unitCost: string; minimumQuantity: string; decantSizeMl: string }
 
 export function PackagingListScreen({ user }: PackagingListScreenProps) {
   const items = usePackagingItems()
   const mutations = usePackagingMutations()
   const [searchQuery, setSearchQuery] = useState("")
   const [lowStockOnly, setLowStockOnly] = useState(false)
-  const [rowEdits, setRowEdits] = useState<
-    Record<string, { name: string; unit: string; quantity: string; unitCost: string; minimumQuantity: string }>
-  >({})
+  const [rowEdits, setRowEdits] = useState<Record<string, RowEdit>>({})
   const [error, setError] = useState("")
-  const [newItem, setNewItem] = useState<NewItemForm>({ name: "", unit: "", unitCost: "", quantity: "", minimumQuantity: "" })
+  const [newItem, setNewItem] = useState<NewItemForm>({
+    name: "",
+    unit: "",
+    unitCost: "",
+    quantity: "",
+    minimumQuantity: "",
+    decantSizeMl: SHARED_SIZE_VALUE,
+  })
 
   const visibleItems = useMemo(() => {
     const query = searchQuery.trim().toLowerCase()
@@ -64,21 +87,28 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
     })
   }, [items.data, searchQuery, lowStockOnly])
 
-  type EditableField = "name" | "unit" | "quantity" | "unitCost" | "minimumQuantity"
+  type EditableField = "name" | "unit" | "quantity" | "unitCost" | "minimumQuantity" | "decantSizeMl"
+
+  function defaultEditFor(item: PackagingItem): RowEdit {
+    return {
+      name: item.name,
+      unit: item.unit,
+      quantity: String(item.quantity),
+      unitCost: String(item.unitCost),
+      minimumQuantity: String(item.minimumQuantity),
+      decantSizeMl: item.decantSizeMl === null ? SHARED_SIZE_VALUE : String(item.decantSizeMl),
+    }
+  }
 
   function editValue(item: PackagingItem, field: EditableField) {
-    return rowEdits[item.id]?.[field] ?? String(item[field])
+    return rowEdits[item.id]?.[field] ?? defaultEditFor(item)[field]
   }
 
   function setEditValue(item: PackagingItem, field: EditableField, value: string) {
     setRowEdits((current) => ({
       ...current,
       [item.id]: {
-        name: current[item.id]?.name ?? item.name,
-        unit: current[item.id]?.unit ?? item.unit,
-        quantity: current[item.id]?.quantity ?? String(item.quantity),
-        unitCost: current[item.id]?.unitCost ?? String(item.unitCost),
-        minimumQuantity: current[item.id]?.minimumQuantity ?? String(item.minimumQuantity),
+        ...(current[item.id] ?? defaultEditFor(item)),
         [field]: value,
       },
     }))
@@ -106,6 +136,7 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
           quantity: Number(edit.quantity),
           unitCost: Number(edit.unitCost),
           minimumQuantity: Number(edit.minimumQuantity),
+          decantSizeMl: edit.decantSizeMl === SHARED_SIZE_VALUE ? null : Number(edit.decantSizeMl),
         },
       })
       setRowEdits((current) => {
@@ -156,8 +187,9 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
         unitCost: Number(newItem.unitCost) || 0,
         quantity: Number(newItem.quantity) || 0,
         minimumQuantity: Number(newItem.minimumQuantity) || 0,
+        decantSizeMl: newItem.decantSizeMl === SHARED_SIZE_VALUE ? null : Number(newItem.decantSizeMl),
       })
-      setNewItem({ name: "", unit: "", unitCost: "", quantity: "", minimumQuantity: "" })
+      setNewItem({ name: "", unit: "", unitCost: "", quantity: "", minimumQuantity: "", decantSizeMl: SHARED_SIZE_VALUE })
       toast.add({ title: "Packaging item added.", type: "success" })
     } catch {
       setError("Could not add packaging item.")
@@ -205,6 +237,7 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
                       <TableHead>Unit cost</TableHead>
                       <TableHead>Quantity</TableHead>
                       <TableHead>Minimum</TableHead>
+                      <TableHead>Applies to</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -262,6 +295,27 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
                               value={editValue(item, "minimumQuantity")}
                               onChange={(event) => setEditValue(item, "minimumQuantity", event.target.value)}
                             />
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              disabled={!item.isActive}
+                              items={decantSizeOptions}
+                              value={editValue(item, "decantSizeMl")}
+                              onValueChange={(value) => setEditValue(item, "decantSizeMl", (value as string) ?? SHARED_SIZE_VALUE)}
+                            >
+                              <SelectTrigger className="data-[size=sm]:h-9 w-32" size="sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  {decantSizeOptions.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
                           </TableCell>
                           <TableCell>
                             <StatusBadge status={status} config={stockStatusConfig} />
@@ -360,6 +414,27 @@ export function PackagingListScreen({ user }: PackagingListScreenProps) {
                   value={newItem.minimumQuantity}
                   onChange={(event) => setNewItem((current) => ({ ...current, minimumQuantity: event.target.value }))}
                 />
+              </Label>
+              <Label className="w-32">
+                Applies to
+                <Select
+                  items={decantSizeOptions}
+                  value={newItem.decantSizeMl}
+                  onValueChange={(value) => setNewItem((current) => ({ ...current, decantSizeMl: (value as string) ?? SHARED_SIZE_VALUE }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {decantSizeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </Label>
               <Button variant="secondary" loading={mutations.createPackagingItem.isPending} loadingText="Adding..." onClick={addItem}>
                 <HugeiconsIcon aria-hidden="true" data-icon="inline-start" icon={PlusSignIcon} strokeWidth={1.5} />

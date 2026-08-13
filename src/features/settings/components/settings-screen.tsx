@@ -181,21 +181,26 @@ export function SettingsScreen({ user }: SettingsScreenProps) {
                       />
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <FormInput
-                        control={form.control}
-                        name="packagingCost"
-                        label="Packaging cost (MVR)"
-                        type="number"
-                        rules={{ required: "Enter a packaging cost." }}
-                      />
-                      <FormInput
-                        control={form.control}
-                        name="operationsBuffer"
-                        label="Operations buffer (MVR)"
-                        type="number"
-                        rules={{ required: "Enter an operations buffer." }}
-                      />
+                    <div className="grid gap-1.5">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <FormInput
+                          control={form.control}
+                          name="packagingCost"
+                          label="Packaging cost fallback (MVR)"
+                          type="number"
+                          rules={{ required: "Enter a packaging cost." }}
+                        />
+                        <FormInput
+                          control={form.control}
+                          name="operationsBuffer"
+                          label="Operations buffer (MVR)"
+                          type="number"
+                          rules={{ required: "Enter an operations buffer." }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Packaging cost fallback is used only when no active packaging items are configured in Packaging — otherwise pricing sums each item&apos;s shared or size-specific cost for the decant size being priced.
+                      </p>
                     </div>
 
                     <FormInput

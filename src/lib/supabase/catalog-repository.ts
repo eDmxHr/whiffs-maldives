@@ -73,6 +73,7 @@ export function mapBottle(row: Record<string, unknown>): Bottle {
     originalVolumeMl: Number(row.original_volume_ml),
     usableVolumeMl: Number(row.usable_volume_ml),
     remainingVolumeMl: Number(row.remaining_volume_ml),
+    committedVolumeMl: Number(row.committed_volume_ml ?? 0),
     purchasePrice: Number(row.purchase_price),
     purchaseDate: (row.purchase_date as string) ?? "",
     receivedAt: row.received_at as string,
@@ -90,6 +91,7 @@ export function mapPackagingItem(row: Record<string, unknown>): PackagingItem {
     quantity: Number(row.quantity),
     minimumQuantity: Number(row.minimum_quantity),
     isActive: row.is_active as boolean,
+    decantSizeMl: row.decant_size_ml === null || row.decant_size_ml === undefined ? null : Number(row.decant_size_ml),
   }
 }
 

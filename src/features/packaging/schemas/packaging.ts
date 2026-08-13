@@ -6,6 +6,7 @@ export const createPackagingItemSchema = z.object({
   unitCost: z.number().nonnegative(),
   quantity: z.number().nonnegative(),
   minimumQuantity: z.number().nonnegative(),
+  decantSizeMl: z.number().positive().nullable().optional(),
 })
 
 export const updatePackagingItemSchema = createPackagingItemSchema.partial()

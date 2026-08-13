@@ -192,6 +192,11 @@ export function BottleDetailScreen({
                     <DetailField label="Original" value={`${bottle.data.originalVolumeMl} ml`} />
                     <DetailField label="Usable" value={`${bottle.data.usableVolumeMl} ml`} />
                     <DetailField label="Remaining" value={`${bottle.data.remainingVolumeMl} ml`} />
+                    <DetailField label="Committed" value={`${bottle.data.committedVolumeMl} ml`} />
+                    <DetailField
+                      label="Available"
+                      value={`${bottle.data.remainingVolumeMl - bottle.data.committedVolumeMl} ml`}
+                    />
                   </DetailGrid>
                 </div>
 

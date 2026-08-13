@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useCatalogMutations } from "@/features/catalog/hooks/use-catalog"
+import { usePackagingItems } from "@/features/packaging/hooks/use-packaging"
 import { useSettings } from "@/features/settings/hooks/use-settings"
 import { earliestAvailableBottle } from "@/lib/inventory"
 import { money } from "@/lib/money"
@@ -45,12 +46,32 @@ function toRows(offerings: Offering[]): OfferingRow[] {
 export function OfferingsEditor({ fragranceId, offerings, bottles }: OfferingsEditorProps) {
   const mutations = useCatalogMutations()
   const settings = useSettings()
+  const packagingItems = usePackagingItems()
   const [rows, setRows] = useState<OfferingRow[]>(() => toRows(offerings))
   const [newSize, setNewSize] = useState("")
   const [newPrice, setNewPrice] = useState("")
   const [error, setError] = useState("")
 
   const suggestionBottle = earliestAvailableBottle(bottles)
+
+  const activePackagingItems = packagingItems.data?.filter((item) => item.isActive) ?? []
+
+  // Packaging cost for a given decant size = shared items (decantSizeMl null) + items
+  // specific to that size (e.g. the 2ml atomizer), not every active item indiscriminately.
+  function packagingItemsForSize(sizeMl: number) {
+    return activePackagingItems.filter((item) => item.decantSizeMl === null || item.decantSizeMl === sizeMl)
+  }
+
+  function packagingCostForSize(sizeMl: number) {
+    if (activePackagingItems.length === 0) {
+      return settings.data?.packagingCost ?? 0
+    }
+
+    return packagingItemsForSize(sizeMl).reduce((sum, item) => sum + item.unitCost, 0)
+  }
+
+  const previewSizeMl = Number(newSize)
+  const hasPreviewSize = Boolean(previewSizeMl && previewSizeMl > 0)
 
   function suggestPrice() {
     setError("")
@@ -70,7 +91,7 @@ export function OfferingsEditor({ fragranceId, offerings, bottles }: OfferingsEd
       bottleCost: suggestionBottle.purchasePrice,
       usableVolumeMl: suggestionBottle.usableVolumeMl,
       decantSizeMl: sizeMl,
-      packagingCost: settings.data.packagingCost,
+      packagingCost: packagingCostForSize(sizeMl),
       operationsBuffer: settings.data.operationsBuffer,
       grossMargin: settings.data.targetGrossMarginPercent / 100,
       gstRate: settings.data.gstEnabled ? settings.data.gstRatePercent / 100 : 0,
@@ -205,6 +226,19 @@ export function OfferingsEditor({ fragranceId, offerings, bottles }: OfferingsEd
           <HugeiconsIcon aria-hidden="true" data-icon="inline-start" icon={PlusSignIcon} strokeWidth={1.5} />
           Add size
         </Button>
+        <p className="w-full text-xs text-muted-foreground">
+          {activePackagingItems.length === 0
+            ? `Packaging cost: ${money(settings.data?.packagingCost ?? 0)} from the settings default (no active packaging items yet).`
+            : hasPreviewSize
+              ? (() => {
+                  const items = packagingItemsForSize(previewSizeMl)
+                  const sharedCount = items.filter((item) => item.decantSizeMl === null).length
+                  const sizeSpecificCount = items.length - sharedCount
+
+                  return `Packaging cost for ${previewSizeMl}ml: ${money(packagingCostForSize(previewSizeMl))} — ${sharedCount} shared item${sharedCount === 1 ? "" : "s"}${sizeSpecificCount ? ` + ${sizeSpecificCount} item${sizeSpecificCount === 1 ? "" : "s"} for ${previewSizeMl}ml` : ""}.`
+                })()
+              : "Enter a size above to see its packaging cost breakdown."}
+        </p>
       </div>
 
       <Button

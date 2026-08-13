@@ -27,6 +27,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       ...(parsed.data.unitCost !== undefined && { unit_cost: parsed.data.unitCost }),
       ...(parsed.data.quantity !== undefined && { quantity: parsed.data.quantity }),
       ...(parsed.data.minimumQuantity !== undefined && { minimum_quantity: parsed.data.minimumQuantity }),
+      ...(parsed.data.decantSizeMl !== undefined && { decant_size_ml: parsed.data.decantSizeMl }),
     })
     .eq("id", id)
     .select("*")

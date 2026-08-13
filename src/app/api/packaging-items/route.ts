@@ -43,6 +43,7 @@ export async function POST(request: Request) {
       unit_cost: parsed.data.unitCost,
       quantity: parsed.data.quantity,
       minimum_quantity: parsed.data.minimumQuantity,
+      decant_size_ml: parsed.data.decantSizeMl ?? null,
     })
     .select("*")
     .single()

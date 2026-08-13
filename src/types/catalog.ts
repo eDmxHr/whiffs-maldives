@@ -49,6 +49,8 @@ export interface Bottle {
   originalVolumeMl: number
   usableVolumeMl: number
   remainingVolumeMl: number
+  /** Volume promised to payment-confirmed-but-not-yet-prepared orders. Available for new orders = remainingVolumeMl - committedVolumeMl. */
+  committedVolumeMl: number
   purchasePrice: number
   purchaseDate: string
   receivedAt: string
