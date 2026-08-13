@@ -8,6 +8,8 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import {
   ArrowRight01Icon,
   Cancel01Icon,
+  MinusSignIcon,
+  PlusSignIcon,
   ZoomInAreaIcon,
 } from "@hugeicons/core-free-icons"
 import Lightbox from "yet-another-react-lightbox"
@@ -15,6 +17,7 @@ import "yet-another-react-lightbox/styles.css"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Container, Section } from "@/components/layouts/container"
 import { toast } from "@/components/ui/toast"
 import { FragranceCard } from "@/features/catalog/components/fragrance-card"
@@ -147,39 +150,93 @@ export function CustomerFragrance({ slug }: { slug: string }) {
   const [selectedOfferingId, setSelectedOfferingId] = useState<string | null>(
     null
   )
+  const [quantity, setQuantity] = useState(1)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
-  const selectedOffering = item?.offerings.find(
-    (offering) => offering.id === selectedOfferingId
-  )
+  // Defaults to the smallest active offering until the customer explicitly picks a different
+  // one -- derived during render rather than synced via an effect, since it's plain state math.
+  const smallestActiveOffering = item
+    ? [...item.offerings]
+        .filter((offering) => offering.isActive)
+        .sort((a, b) => a.sizeMl - b.sizeMl)[0]
+    : undefined
+
+  const selectedOffering =
+    item?.offerings.find((offering) => offering.id === selectedOfferingId) ??
+    smallestActiveOffering
 
   function handleAddToCart() {
     if (!item || !selectedOffering) {
       return
     }
 
-    addLine({
-      fragranceId: item.id,
-      offeringId: selectedOffering.id,
-      fragranceName: item.name,
-      brandName: item.brand.name,
-      sizeMl: selectedOffering.sizeMl,
-      price: selectedOffering.price,
-      heroImageUrl: item.heroImage?.publicUrl,
-    })
+    addLine(
+      {
+        fragranceId: item.id,
+        offeringId: selectedOffering.id,
+        fragranceName: item.name,
+        brandName: item.brand.name,
+        sizeMl: selectedOffering.sizeMl,
+        price: selectedOffering.price,
+        heroImageUrl: item.heroImage?.publicUrl,
+      },
+      quantity
+    )
 
     toast.add({
       title: "Added to cart",
-      description: `${item.name} · ${selectedOffering.name}`,
+      description: `${quantity} × ${item.name} · ${selectedOffering.name}`,
       type: "success",
     })
+
+    setQuantity(1)
   }
 
   if (fragrance.isLoading) {
     return (
       <Section bordered={false}>
-        <Container className="py-8">Loading fragrance...</Container>
+        <Container className="grid gap-8 py-8 md:grid-cols-[1.05fr_0.95fr]">
+          <div>
+            <Skeleton className="aspect-square w-full rounded-2xl" />
+            <div className="mt-3 grid grid-cols-4 gap-3">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton key={index} className="aspect-square rounded-xl" />
+              ))}
+            </div>
+          </div>
+
+          <div className="py-4">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="mt-4 h-11 w-3/4" />
+            <Skeleton className="mt-4 h-4 w-32" />
+            <div className="mt-6 grid gap-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-5/6" />
+            </div>
+
+            <Card className="mt-8 grid gap-3 border-border bg-card p-5">
+              <Skeleton className="h-7 w-20" />
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="flex gap-4">
+                  <Skeleton className="h-4 w-12 shrink-0" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              ))}
+            </Card>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Skeleton key={index} className="h-15 min-w-24 flex-1 rounded-xl" />
+              ))}
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 md:flex-row">
+              <Skeleton className="h-10 w-full rounded-lg md:w-36 md:shrink-0" />
+              <Skeleton className="h-10 w-full rounded-lg md:flex-1" />
+            </div>
+          </div>
+        </Container>
       </Section>
     )
   }
@@ -295,7 +352,7 @@ export function CustomerFragrance({ slug }: { slug: string }) {
 
           <div className="mt-8 flex flex-wrap gap-3">
             {item.offerings.map((offering) => {
-              const selected = offering.id === selectedOfferingId
+              const selected = offering.id === selectedOffering?.id
 
               return (
                 <button
@@ -326,16 +383,39 @@ export function CustomerFragrance({ slug }: { slug: string }) {
             })}
           </div>
 
-          <Button
-            className="mt-8"
-            disabled={!selectedOffering}
-            onClick={handleAddToCart}
-            variant="luxury"
-          >
-            {selectedOffering
-              ? `Add ${selectedOffering.name} to cart · ${money(selectedOffering.price)}`
-              : "Select a size"}
-          </Button>
+          <div className="mt-6 flex flex-col gap-3 md:flex-row">
+            <div className="flex w-full items-center justify-between rounded-lg border border-border md:w-36 md:shrink-0">
+              <button
+                aria-label="Decrease quantity"
+                className="flex size-10 items-center justify-center text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+                disabled={quantity <= 1}
+                onClick={() => setQuantity((current) => Math.max(1, current - 1))}
+                type="button"
+              >
+                <HugeiconsIcon aria-hidden="true" className="size-4" icon={MinusSignIcon} strokeWidth={1.5} />
+              </button>
+              <span className="flex-1 text-center text-sm font-semibold">
+                {quantity}
+              </span>
+              <button
+                aria-label="Increase quantity"
+                className="flex size-10 items-center justify-center text-foreground transition hover:bg-muted"
+                onClick={() => setQuantity((current) => current + 1)}
+                type="button"
+              >
+                <HugeiconsIcon aria-hidden="true" className="size-4" icon={PlusSignIcon} strokeWidth={1.5} />
+              </button>
+            </div>
+
+            <Button
+              className="w-full md:flex-1"
+              disabled={!selectedOffering}
+              onClick={handleAddToCart}
+              variant="luxury"
+            >
+              {selectedOffering ? "Add to cart" : "Select a size"}
+            </Button>
+          </div>
         </div>
       </Container>
 

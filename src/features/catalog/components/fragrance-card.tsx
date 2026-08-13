@@ -4,14 +4,17 @@ import Link from "next/link"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons"
 
-import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
+import { money } from "@/lib/money"
 import type { FragranceView } from "@/types/catalog"
 
 export function FragranceCard({ fragrance }: { fragrance: FragranceView }) {
   const availableOfferings = fragrance.offerings
     .filter((offering) => offering.isActive)
     .sort((a, b) => a.sizeMl - b.sizeMl)
+  const fromPrice = availableOfferings.length
+    ? Math.min(...availableOfferings.map((offering) => offering.price))
+    : null
 
   return (
     <Link
@@ -31,21 +34,15 @@ export function FragranceCard({ fragrance }: { fragrance: FragranceView }) {
         <div className="p-5">
           <div className="text-sm text-admin-champagne-deep">
             {fragrance.brand.name}
+            {fragrance.concentration ? ` · ${fragrance.concentration}` : ""}
           </div>
           <h3 className="mt-1 font-heading text-2xl font-semibold">
             {fragrance.name}
           </h3>
-          <p className="text-sm text-muted-foreground">
-            {fragrance.concentration}
-          </p>
-          {availableOfferings.length > 0 ? (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {availableOfferings.map((offering) => (
-                <Badge key={offering.id} variant="neutral">
-                  {offering.sizeMl}ml
-                </Badge>
-              ))}
-            </div>
+          {fromPrice !== null ? (
+            <p className="mt-3 text-sm text-muted-foreground">
+              From {money(fromPrice)}
+            </p>
           ) : null}
           <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-admin-reef">
             Details

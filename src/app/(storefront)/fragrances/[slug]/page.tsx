@@ -3,5 +3,5 @@ import { CustomerFragrance } from "@/features/catalog/components/customer-catalo
 export default async function FragrancePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 
-  return <CustomerFragrance slug={slug} />
+  return <CustomerFragrance key={slug} slug={slug} />
 }
