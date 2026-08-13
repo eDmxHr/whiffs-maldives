@@ -32,6 +32,8 @@ export type FragranceInput = {
   releaseYear?: number
   perfumer: string
   gender: string
+  isFeatured?: boolean
+  isBestSeller?: boolean
   notes: Array<{ name: string; category: string; pyramidLevel: "top" | "heart" | "base"; position: number }>
 }
 

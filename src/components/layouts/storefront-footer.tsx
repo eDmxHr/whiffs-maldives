@@ -31,7 +31,7 @@ export function StorefrontFooter() {
               Whiffs Maldives
             </p>
             <p className="mt-4 max-w-sm text-sm leading-7 text-admin-pearl/65">
-              Authentic fragrances, hand-poured to order in Malé and delivered
+              Authentic fragrances, hand-poured to order and delivered
               across the islands. Explore a scent properly before committing to
               the bottle.
             </p>

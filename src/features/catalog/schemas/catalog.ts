@@ -21,6 +21,8 @@ export const createFragranceSchema = z.object({
   releaseYear: z.number().int().min(1800).max(2100).optional(),
   perfumer: z.string().optional().default(""),
   gender: z.string().optional().default(""),
+  isFeatured: z.boolean().optional().default(false),
+  isBestSeller: z.boolean().optional().default(false),
   notes: z.array(fragranceNoteSchema).default([]),
 })
 

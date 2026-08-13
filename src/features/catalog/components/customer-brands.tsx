@@ -53,7 +53,7 @@ export function CustomerBrands() {
             </p>
           </div>
         ) : (
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
+          <div className="mt-12 grid gap-5 md:grid-cols-3 xl:grid-cols-4">
             {brands.map((group, index) => (
               <Reveal delay={index === 0 ? 0 : index === 1 ? 150 : 300} key={group.brand.id}>
                 <Link className="group block transition hover:-translate-y-0.5" href={`/brands/${group.brand.slug}`}>
@@ -74,9 +74,14 @@ export function CustomerBrands() {
                       <p className="mt-1 text-sm text-muted-foreground">
                         {group.fragrances.length} fragrance{group.fragrances.length > 1 ? "s" : ""}
                       </p>
-                      <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-admin-reef transition group-hover:gap-2.5">
+                      <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-admin-reef">
                         View brand
-                        <HugeiconsIcon aria-hidden="true" className="size-4" icon={ArrowRight01Icon} strokeWidth={2} />
+                        <HugeiconsIcon
+                          aria-hidden="true"
+                          className="size-4 transition-transform group-hover:translate-x-1"
+                          icon={ArrowRight01Icon}
+                          strokeWidth={2}
+                        />
                       </span>
                     </div>
                   </Card>

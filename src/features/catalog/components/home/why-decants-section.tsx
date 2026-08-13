@@ -39,7 +39,7 @@ export function WhyDecantsSection() {
             The smarter way to build a fragrance wardrobe.
           </h2>
           <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground">
-            The scents are real, the bottles are smaller — and your collection grows with far less risk.
+            The scents are real, the bottles are smaller — build a collection with confidence, whether it&apos;s your first bottle or your fiftieth.
           </p>
         </Reveal>
 

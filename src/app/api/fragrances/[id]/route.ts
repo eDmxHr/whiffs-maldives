@@ -41,6 +41,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if (scalarInput.releaseYear !== undefined) updates.release_year = scalarInput.releaseYear
   if (scalarInput.perfumer !== undefined) updates.perfumer = scalarInput.perfumer || null
   if (scalarInput.gender !== undefined) updates.gender = scalarInput.gender || null
+  if (scalarInput.isFeatured !== undefined) updates.is_featured = scalarInput.isFeatured
+  if (scalarInput.isBestSeller !== undefined) updates.is_best_seller = scalarInput.isBestSeller
 
   if (Object.keys(updates).length) {
     const { error } = await supabase.from("fragrances").update(updates).eq("id", id)

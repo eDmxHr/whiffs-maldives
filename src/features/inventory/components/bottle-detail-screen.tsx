@@ -230,7 +230,7 @@ export function BottleDetailScreen({
                   className="flex flex-wrap items-start gap-3"
                   onSubmit={adjustmentForm.handleSubmit(submitAdjustment)}
                 >
-                  <div className="w-40">
+                  <div className="w-52">
                     <FormInput
                       control={adjustmentForm.control}
                       name="quantityMl"

@@ -14,6 +14,9 @@ const baseFragrance: Fragrance = {
   gender: "Unisex",
   status: "draft",
   isActive: true,
+  isFeatured: false,
+  isBestSeller: false,
+  createdAt: "2026-01-01T00:00:00.000Z",
   images: [
     {
       id: "image_1",

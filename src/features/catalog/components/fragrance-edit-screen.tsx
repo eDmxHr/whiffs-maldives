@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { ArrowLeft02Icon, PerfumeIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 
@@ -11,6 +11,7 @@ import { LoadingState } from "@/components/common/loading-state"
 import { AdminShell } from "@/components/layouts/admin-shell"
 import { PageWrapper, SectionWrapper } from "@/components/layouts/page"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
 import { FormInput } from "@/components/forms/form-input"
 import { FormSelect } from "@/components/forms/form-select"
 import { FormTextarea } from "@/components/forms/form-textarea"
@@ -25,6 +26,8 @@ type FragranceForm = {
   releaseYear: string
   perfumer: string
   gender: string
+  isFeatured: boolean
+  isBestSeller: boolean
   topNotes: string
   heartNotes: string
   baseNotes: string
@@ -59,11 +62,16 @@ export function FragranceEditScreen({ user, fragranceId }: FragranceEditScreenPr
       releaseYear: "",
       perfumer: "",
       gender: "",
+      isFeatured: false,
+      isBestSeller: false,
       topNotes: "",
       heartNotes: "",
       baseNotes: "",
     },
   })
+
+  const isFeatured = useWatch({ control: form.control, name: "isFeatured" })
+  const isBestSeller = useWatch({ control: form.control, name: "isBestSeller" })
 
   useEffect(() => {
     if (fragrance.data) {
@@ -75,6 +83,8 @@ export function FragranceEditScreen({ user, fragranceId }: FragranceEditScreenPr
         releaseYear: fragrance.data.releaseYear ? String(fragrance.data.releaseYear) : "",
         perfumer: fragrance.data.perfumer,
         gender: fragrance.data.gender,
+        isFeatured: fragrance.data.isFeatured,
+        isBestSeller: fragrance.data.isBestSeller,
         topNotes: notesToString(fragrance.data.notes, "top"),
         heartNotes: notesToString(fragrance.data.notes, "heart"),
         baseNotes: notesToString(fragrance.data.notes, "base"),
@@ -93,6 +103,8 @@ export function FragranceEditScreen({ user, fragranceId }: FragranceEditScreenPr
         releaseYear: values.releaseYear ? Number(values.releaseYear) : undefined,
         perfumer: values.perfumer,
         gender: values.gender,
+        isFeatured: values.isFeatured,
+        isBestSeller: values.isBestSeller,
         notes: [
           ...parseNotes(values.topNotes, "top"),
           ...parseNotes(values.heartNotes, "heart"),
@@ -164,6 +176,29 @@ export function FragranceEditScreen({ user, fragranceId }: FragranceEditScreenPr
                 <FormInput control={form.control} name="topNotes" label="Top notes" placeholder="Comma separated" />
                 <FormInput control={form.control} name="heartNotes" label="Heart notes" placeholder="Comma separated" />
                 <FormInput control={form.control} name="baseNotes" label="Base notes" placeholder="Comma separated" />
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="flex items-center justify-between gap-4 rounded-lg border border-border px-4 py-3">
+                  <div className="grid gap-1">
+                    <p className="text-sm font-medium text-foreground">Featured on homepage</p>
+                    <p className="text-xs text-muted-foreground">Surfaces first in the storefront collection grid.</p>
+                  </div>
+                  <Switch
+                    checked={isFeatured}
+                    onCheckedChange={(checked) => form.setValue("isFeatured", checked === true)}
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4 rounded-lg border border-border px-4 py-3">
+                  <div className="grid gap-1">
+                    <p className="text-sm font-medium text-foreground">Best seller</p>
+                    <p className="text-xs text-muted-foreground">Included in the storefront&apos;s Best Sellers view.</p>
+                  </div>
+                  <Switch
+                    checked={isBestSeller}
+                    onCheckedChange={(checked) => form.setValue("isBestSeller", checked === true)}
+                  />
+                </div>
               </div>
 
               <Button className="w-fit" type="submit" loading={mutations.updateFragrance.isPending} loadingText="Saving changes...">

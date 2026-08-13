@@ -78,6 +78,9 @@ export interface Fragrance {
   gender: string
   status: "draft" | "published" | "archived"
   isActive: boolean
+  isFeatured: boolean
+  isBestSeller: boolean
+  createdAt: string
   images: FragranceImage[]
   notes: FragranceNote[]
   offerings: Offering[]

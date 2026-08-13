@@ -1,14 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
-
 "use client"
 
 import Link from "next/link"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons"
 
-import { Card } from "@/components/ui/card"
 import { Container, Section } from "@/components/layouts/container"
 import { Reveal } from "@/components/motion/reveal"
+import { FragranceCard } from "@/features/catalog/components/fragrance-card"
 import { useFragrances } from "@/features/catalog/hooks/use-catalog"
 
 export function CustomerBrandDetail({ slug }: { slug: string }) {
@@ -54,26 +50,10 @@ export function CustomerBrandDetail({ slug }: { slug: string }) {
           </p>
         </Reveal>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
+        <div className="mt-12 grid gap-5 md:grid-cols-3 xl:grid-cols-4">
           {brandFragrances.map((fragrance, index) => (
             <Reveal delay={index === 0 ? 0 : index === 1 ? 150 : 300} key={fragrance.id}>
-              <Link href={`/fragrances/${fragrance.slug}`} className="group block transition hover:-translate-y-0.5">
-                <Card className="overflow-hidden border-border bg-card transition group-hover:shadow-lg">
-                  {fragrance.heroImage ? (
-                    <img className="aspect-4/3 w-full object-cover" src={fragrance.heroImage.publicUrl} alt="" />
-                  ) : (
-                    <div className="aspect-4/3 bg-admin-reef" />
-                  )}
-                  <div className="p-5">
-                    <h3 className="font-heading text-2xl font-semibold">{fragrance.name}</h3>
-                    <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted-foreground">{fragrance.description}</p>
-                    <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-admin-reef transition group-hover:gap-2.5">
-                      Details
-                      <HugeiconsIcon aria-hidden="true" className="size-4" icon={ArrowRight01Icon} strokeWidth={2} />
-                    </span>
-                  </div>
-                </Card>
-              </Link>
+              <FragranceCard fragrance={fragrance} />
             </Reveal>
           ))}
         </div>

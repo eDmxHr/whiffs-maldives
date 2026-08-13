@@ -17,6 +17,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 
 const fragranceCategories = [
   { label: "All fragrances", href: "/fragrances" },
+  { label: "New arrivals", href: "/fragrances?view=new" },
+  { label: "Best sellers", href: "/fragrances?view=best-sellers" },
   { label: "Men", href: "/fragrances?gender=men" },
   { label: "Women", href: "/fragrances?gender=women" },
   { label: "Unisex", href: "/fragrances?gender=unisex" },
