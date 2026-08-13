@@ -24,7 +24,7 @@ export default function CheckoutPage() {
 
   return (
     <Section bordered={false}>
-      <Container className="py-10">
+      <Container className="py-12 md:py-16">
         <p className="text-xs font-semibold uppercase tracking-widest text-admin-champagne">Checkout</p>
         <h1 className="mt-2 font-heading text-4xl font-semibold">Complete your order</h1>
 

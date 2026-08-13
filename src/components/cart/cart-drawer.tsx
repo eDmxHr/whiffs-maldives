@@ -44,10 +44,15 @@ export function CartDrawerContent() {
             <span className="text-muted-foreground">Subtotal</span>
             <span className="font-semibold">{money(cartSubtotal(lines))}</span>
           </div>
-          <SheetClose render={<Link className={cn(buttonVariants({ variant: "luxury" }))} href="/checkout" />}>
+          <SheetClose
+            nativeButton={false}
+            render={<Link className={cn(buttonVariants({ variant: "luxury" }))} href="/checkout" />}
+          >
             Checkout
           </SheetClose>
-          <SheetClose render={<Link className={buttonVariants({ variant: "ghost" })} href="/cart" />}>View cart</SheetClose>
+          <SheetClose nativeButton={false} render={<Link className={buttonVariants({ variant: "ghost" })} href="/cart" />}>
+            View cart
+          </SheetClose>
         </SheetFooter>
       ) : null}
     </>

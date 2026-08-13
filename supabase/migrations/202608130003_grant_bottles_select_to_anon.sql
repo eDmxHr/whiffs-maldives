@@ -1,0 +1,11 @@
+-- The public fragrance listing (FRAGRANCE_VIEW_SELECT in catalog-repository.ts) embeds
+-- bottles(*) alongside brand/images/notes/offerings. anon never got a base SELECT grant on
+-- bottles (unlike every other embedded table), which the "fix_missing_table_grants" migration
+-- missed. PostgREST fails the whole embedded query with 42501 when any single embed lacks the
+-- grant, so every /api/fragrances?status=published request silently returned zero rows to
+-- customers even for published, active fragrances.
+--
+-- Safe to grant: RLS on bottles ("inventory.view can read bottles") already restricts every row
+-- to staff with the inventory.view permission, so anon still sees an empty bottles array per
+-- fragrance -- this only unblocks the query, it does not expose bottle cost/supplier data.
+grant select on public.bottles to anon;

@@ -17,7 +17,7 @@ export default function CartPage() {
 
   return (
     <Section bordered={false}>
-      <Container className="py-10">
+      <Container className="py-12 md:py-16">
         <p className="text-xs font-semibold uppercase tracking-widest text-admin-champagne">Your cart</p>
         <h1 className="mt-2 font-heading text-4xl font-semibold">
           {lines.length === 0 ? "Nothing here yet" : `${lines.length} fragrance${lines.length > 1 ? "s" : ""} selected`}

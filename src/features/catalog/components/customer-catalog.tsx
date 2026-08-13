@@ -4,30 +4,69 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowRight01Icon, Cancel01Icon, ZoomInAreaIcon } from "@hugeicons/core-free-icons"
+import Lightbox from "yet-another-react-lightbox"
+import "yet-another-react-lightbox/styles.css"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Container, Section } from "@/components/layouts/container"
 import { toast } from "@/components/ui/toast"
-import { useFragrance, useFragrances } from "@/features/catalog/hooks/use-catalog"
+import {
+  useFragrance,
+  useFragrances,
+} from "@/features/catalog/hooks/use-catalog"
 import { useCartStore } from "@/stores/cart-store"
 import { money } from "@/lib/money"
 import { cn } from "@/lib/utils"
 
 export function CatalogHero() {
   return (
-    <Section bordered={false}>
-      <Container className="grid min-h-[64svh] content-end py-10">
-        <p className="text-xs font-semibold uppercase tracking-widest text-admin-champagne">Whiffs Maldives</p>
-        <h1 className="mt-4 max-w-4xl font-heading text-5xl font-semibold leading-[0.95] md:text-7xl">
-          Fragrance discovery, decanted for island air.
-        </h1>
-        <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
-          Browse the first published scents, compare GST-inclusive decant sizes, and validate the catalog spine before checkout arrives.
-        </p>
-      </Container>
-    </Section>
+    <section className="bg-background p-3 sm:p-4 md:p-5">
+      <div className="relative flex min-h-[86svh] overflow-hidden rounded-3xl bg-admin-reef-deep">
+        <img
+          alt="Spraying a golden fragrance"
+          className="absolute inset-0 size-full animate-in object-cover object-center duration-1000 fill-mode-both fade-in"
+          src="https://images.unsplash.com/photo-1622618991746-fe6004db3a47?q=80&w=1600&auto=format&fit=crop"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-linear-to-b from-black/50 via-black/10 to-black/70 md:from-black/45 md:via-black/15 md:to-black/60"
+        />
+
+        <Container className="relative flex flex-1 flex-col justify-end gap-10 pt-16 pb-8 md:justify-between md:gap-0 md:pt-20 md:pb-12">
+          <div>
+            <p className="animate-in text-xs font-semibold tracking-widest text-admin-champagne uppercase delay-200 duration-700 fill-mode-both fade-in slide-in-from-bottom-4">
+              Whiffs Maldives
+            </p>
+            <h1 className="mt-5 max-w-3xl animate-in font-heading text-4xl leading-[1.02] font-semibold text-admin-pearl delay-300 duration-700 fill-mode-both fade-in slide-in-from-bottom-4 sm:text-5xl md:text-7xl md:leading-[0.98]">
+              Fragrance discovery,{" "}
+              <span className="text-admin-pearl/60">
+                decanted for island air.
+              </span>
+            </h1>
+          </div>
+
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end md:gap-8">
+            <p className="max-w-sm animate-in text-sm leading-7 text-admin-pearl/80 delay-500 duration-700 fill-mode-both fade-in slide-in-from-bottom-4">
+              Authentic fragrances from Middle Eastern houses to designer,
+              niche, and high-end labels — hand-poured to order in Malé, so you
+              can wear a scent properly before committing to the bottle.
+            </p>
+            <Link
+              className={cn(
+                buttonVariants({ variant: "luxury", size: "lg" }),
+                "group w-fit animate-in delay-500 duration-700 fill-mode-both fade-in"
+              )}
+              href="#collection"
+            >
+              Browse the collection
+            </Link>
+          </div>
+        </Container>
+      </div>
+    </section>
   )
 }
 
@@ -35,12 +74,27 @@ export function CatalogGrid() {
   const fragrances = useFragrances(true)
 
   return (
-    <Section>
-      <Container className="py-8">
-        <p className="text-xs font-semibold uppercase tracking-widest text-admin-champagne">The collection</p>
-        <h2 className="mt-2 font-heading text-3xl font-semibold">Every scent, ready to try</h2>
+    <Section id="collection">
+      <Container className="py-20 md:py-28">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold tracking-widest text-admin-champagne uppercase">
+              The collection
+            </p>
+            <h2 className="mt-2 font-heading text-4xl font-semibold md:text-5xl">
+              Every scent, ready to try
+            </h2>
+          </div>
+          <Link
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-admin-reef transition hover:gap-2.5"
+            href="/fragrances"
+          >
+            View all fragrances
+            <HugeiconsIcon aria-hidden="true" className="size-4" icon={ArrowRight01Icon} strokeWidth={2} />
+          </Link>
+        </div>
 
-        <div className="mt-6 grid gap-5 md:grid-cols-3">
+        <div className="mt-16 grid gap-5 md:grid-cols-3">
           {fragrances.data?.map((fragrance) => (
             <Link
               href={`/fragrances/${fragrance.slug}`}
@@ -49,21 +103,28 @@ export function CatalogGrid() {
             >
               <Card className="overflow-hidden border-border bg-card transition group-hover:shadow-lg">
                 {fragrance.heroImage ? (
-                  <img className="aspect-4/3 w-full object-cover" src={fragrance.heroImage.publicUrl} alt="" />
+                  <img
+                    className="aspect-4/3 w-full object-cover"
+                    src={fragrance.heroImage.publicUrl}
+                    alt=""
+                  />
                 ) : (
                   <div className="aspect-4/3 bg-admin-reef" />
                 )}
                 <div className="p-5">
-                  <div className="text-sm text-admin-champagne-deep">{fragrance.brand.name}</div>
-                  <h3 className="mt-1 font-heading text-2xl font-semibold">{fragrance.name}</h3>
-                  <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted-foreground">{fragrance.description}</p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {fragrance.offerings.map((offering) => (
-                      <Badge key={offering.id} className="bg-card text-admin-reef" variant="secondary">
-                        {offering.name} · {money(offering.price)}
-                      </Badge>
-                    ))}
+                  <div className="text-sm text-admin-champagne-deep">
+                    {fragrance.brand.name}
                   </div>
+                  <h3 className="mt-1 font-heading text-2xl font-semibold">
+                    {fragrance.name}
+                  </h3>
+                  <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted-foreground">
+                    {fragrance.description}
+                  </p>
+                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-admin-reef transition group-hover:gap-2.5">
+                    Details
+                    <HugeiconsIcon aria-hidden="true" className="size-4" icon={ArrowRight01Icon} strokeWidth={2} />
+                  </span>
                 </div>
               </Card>
             </Link>
@@ -71,7 +132,17 @@ export function CatalogGrid() {
         </div>
 
         {fragrances.data && fragrances.data.length === 0 ? (
-          <p className="mt-6 text-sm text-muted-foreground">New fragrances are being added — check back soon.</p>
+          <div className="mt-8 grid place-items-center rounded-2xl border border-dashed border-admin-champagne/50 px-6 py-20 text-center">
+            <div aria-hidden="true" className="flex items-end gap-2 opacity-70">
+              <div className="h-10 w-4 rounded-sm bg-admin-reef/25" />
+              <div className="h-14 w-5 rounded-sm bg-admin-reef/40" />
+              <div className="h-12 w-4 rounded-sm bg-admin-reef/25" />
+            </div>
+            <p className="mt-6 font-heading text-2xl font-semibold">The first pours are on their way</p>
+            <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
+              We are decanting the opening collection now — check back soon.
+            </p>
+          </div>
         ) : null}
       </Container>
     </Section>
@@ -82,9 +153,15 @@ export function CustomerFragrance({ slug }: { slug: string }) {
   const fragrance = useFragrance(slug)
   const item = fragrance.data
   const addLine = useCartStore((state) => state.addLine)
-  const [selectedOfferingId, setSelectedOfferingId] = useState<string | null>(null)
+  const [selectedOfferingId, setSelectedOfferingId] = useState<string | null>(
+    null
+  )
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
-  const selectedOffering = item?.offerings.find((offering) => offering.id === selectedOfferingId)
+  const selectedOffering = item?.offerings.find(
+    (offering) => offering.id === selectedOfferingId
+  )
 
   function handleAddToCart() {
     if (!item || !selectedOffering) {
@@ -101,7 +178,11 @@ export function CustomerFragrance({ slug }: { slug: string }) {
       heroImageUrl: item.heroImage?.publicUrl,
     })
 
-    toast.add({ title: "Added to cart", description: `${item.name} · ${selectedOffering.name}`, type: "success" })
+    toast.add({
+      title: "Added to cart",
+      description: `${item.name} · ${selectedOffering.name}`,
+      type: "success",
+    })
   }
 
   if (fragrance.isLoading) {
@@ -120,34 +201,80 @@ export function CustomerFragrance({ slug }: { slug: string }) {
     )
   }
 
+  const activeImage = item.images[activeImageIndex]
+
   return (
     <Section bordered={false}>
       <Container className="grid gap-8 py-8 md:grid-cols-[1.05fr_0.95fr]">
         <div>
-          {item.heroImage ? (
-            <img className="aspect-4/5 w-full rounded-2xl object-cover" src={item.heroImage.publicUrl} alt="" />
-          ) : (
-            <div className="aspect-4/5 rounded-2xl bg-admin-reef" />
-          )}
-          <div className="mt-3 grid grid-cols-4 gap-3">
-            {item.images.map((image) => (
-              <img key={image.id} className="aspect-square rounded-xl object-cover" src={image.publicUrl} alt="" />
-            ))}
-          </div>
+          <button
+            className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden rounded-2xl"
+            onClick={() => setLightboxOpen(true)}
+            type="button"
+          >
+            {activeImage ? (
+              <img className="size-full object-cover" src={activeImage.publicUrl} alt="" />
+            ) : (
+              <div className="size-full bg-admin-reef" />
+            )}
+            {activeImage ? (
+              <span className="absolute right-3 bottom-3 flex size-9 items-center justify-center rounded-full bg-background/90 text-foreground opacity-0 transition group-hover:opacity-100">
+                <HugeiconsIcon aria-hidden="true" className="size-4" icon={ZoomInAreaIcon} strokeWidth={1.5} />
+              </span>
+            ) : null}
+          </button>
+
+          {item.images.length > 1 ? (
+            <div className="mt-3 grid grid-cols-4 gap-3">
+              {item.images.map((image, index) => (
+                <button
+                  key={image.id}
+                  className={cn(
+                    "aspect-square overflow-hidden rounded-xl outline-2 outline-offset-2 transition",
+                    index === activeImageIndex ? "outline-admin-reef" : "outline-transparent hover:outline-border"
+                  )}
+                  onClick={() => setActiveImageIndex(index)}
+                  type="button"
+                >
+                  <img className="size-full object-cover" src={image.publicUrl} alt="" />
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         <div className="py-4">
-          <Link className="text-sm text-admin-champagne-deep" href="/">
-            Browse fragrances
-          </Link>
-          <p className="mt-8 text-xs font-semibold uppercase tracking-widest text-admin-champagne">{item.brand.name}</p>
-          <h1 className="mt-3 font-heading text-5xl font-semibold leading-none">{item.name}</h1>
+          <p className="text-xs font-semibold tracking-widest text-admin-champagne uppercase">
+            {item.brand.name}
+          </p>
+          <h1 className="mt-3 font-heading text-5xl leading-none font-semibold">
+            {item.name}
+          </h1>
           <p className="mt-4 text-sm text-muted-foreground">
             {item.concentration} · {item.gender}
           </p>
-          <p className="mt-6 max-w-xl text-base leading-7 text-foreground/80">{item.description}</p>
+          <p className="mt-6 max-w-xl text-base leading-7 text-foreground/80">
+            {item.description}
+          </p>
 
-          <div className="mt-8 grid gap-3">
+          <Card className="mt-8 grid gap-3 border-border bg-card p-5">
+            <h2 className="font-heading text-2xl font-semibold">Notes</h2>
+            {(["top", "heart", "base"] as const).map((level) => (
+              <div key={level} className="flex gap-4 text-sm">
+                <div className="w-16 shrink-0 tracking-wide text-admin-champagne-deep uppercase">
+                  {level}
+                </div>
+                <div>
+                  {item.notes
+                    .filter((note) => note.pyramidLevel === level)
+                    .map((note) => note.name)
+                    .join(", ") || "To be added"}
+                </div>
+              </div>
+            ))}
+          </Card>
+
+          <div className="mt-8 flex flex-wrap gap-3">
             {item.offerings.map((offering) => {
               const selected = offering.id === selectedOfferingId
 
@@ -155,44 +282,50 @@ export function CustomerFragrance({ slug }: { slug: string }) {
                 <button
                   key={offering.id}
                   className={cn(
-                    "flex items-center justify-between rounded-xl border p-4 text-left transition",
+                    "min-w-24 flex-1 rounded-xl border px-4 py-3 text-center transition",
                     offering.isActive
                       ? selected
-                        ? "border-admin-reef bg-card ring-2 ring-admin-reef/30"
+                        ? "border-admin-reef bg-admin-reef text-white"
                         : "border-border bg-card hover:border-admin-reef/50"
-                      : "cursor-not-allowed border-border bg-card opacity-50"
+                      : "cursor-not-allowed border-border bg-card opacity-40"
                   )}
                   disabled={!offering.isActive}
                   onClick={() => setSelectedOfferingId(offering.id)}
                   type="button"
                 >
-                  <div>
-                    <div className="font-medium">{offering.name} decant</div>
-                    <div className="text-xs text-muted-foreground">
-                      {offering.isActive ? "GST included" : "Out of stock"}
-                    </div>
+                  <div className="text-sm font-semibold">{offering.name}</div>
+                  <div className={cn("mt-0.5 text-xs", selected ? "text-white/80" : "text-muted-foreground")}>
+                    {offering.isActive ? money(offering.price) : "Out of stock"}
                   </div>
-                  <div className="font-semibold">{money(offering.price)}</div>
                 </button>
               )
             })}
           </div>
 
-          <Card className="mt-8 grid gap-3 border-border bg-card p-5">
-            <h2 className="font-heading text-2xl font-semibold">Notes</h2>
-            {(["top", "heart", "base"] as const).map((level) => (
-              <div key={level} className="flex gap-4 text-sm">
-                <div className="w-16 shrink-0 uppercase tracking-wide text-admin-champagne-deep">{level}</div>
-                <div>{item.notes.filter((note) => note.pyramidLevel === level).map((note) => note.name).join(", ") || "To be added"}</div>
-              </div>
-            ))}
-          </Card>
-
-          <Button className="mt-8" disabled={!selectedOffering} onClick={handleAddToCart} variant="luxury">
-            {selectedOffering ? `Add ${selectedOffering.name} to cart` : "Select a size"}
+          <Button
+            className="mt-8"
+            disabled={!selectedOffering}
+            onClick={handleAddToCart}
+            variant="luxury"
+          >
+            {selectedOffering
+              ? `Add ${selectedOffering.name} to cart · ${money(selectedOffering.price)}`
+              : "Select a size"}
           </Button>
         </div>
       </Container>
+
+      <Lightbox
+        close={() => setLightboxOpen(false)}
+        controller={{ closeOnBackdropClick: true }}
+        index={activeImageIndex}
+        on={{ view: ({ index }) => setActiveImageIndex(index) }}
+        open={lightboxOpen}
+        render={{
+          iconClose: () => <HugeiconsIcon icon={Cancel01Icon} strokeWidth={1.5} />,
+        }}
+        slides={item.images.map((image) => ({ src: image.publicUrl, alt: item.name }))}
+      />
     </Section>
   )
 }
