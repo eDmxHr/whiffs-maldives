@@ -121,7 +121,7 @@ export function CheckoutForm() {
 
       <div className="h-fit grid gap-4 rounded-xl border border-border bg-card p-5">
         <h2 className="font-heading text-lg font-semibold">Order review</h2>
-        <div className="grid gap-3">
+        <div>
           {lines.map((line) => (
             <CartLineItem key={line.offeringId} line={line} readOnly />
           ))}

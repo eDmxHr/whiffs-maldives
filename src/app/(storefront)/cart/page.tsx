@@ -16,7 +16,7 @@ export default function CartPage() {
   const removeLine = useCartStore((state) => state.removeLine)
 
   return (
-    <Section bordered={false}>
+    <Section bordered={false} className="min-h-screen">
       <Container className="py-12 md:py-16">
         <p className="text-xs font-semibold uppercase tracking-widest text-admin-champagne">Your cart</p>
         <h1 className="mt-2 font-heading text-4xl font-semibold">

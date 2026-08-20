@@ -16,7 +16,6 @@ import Lightbox from "yet-another-react-lightbox"
 import "yet-another-react-lightbox/styles.css"
 
 import { Button, buttonVariants } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Container, Section } from "@/components/layouts/container"
 import { toast } from "@/components/ui/toast"
@@ -215,7 +214,7 @@ export function CustomerFragrance({ slug }: { slug: string }) {
               <Skeleton className="h-4 w-5/6" />
             </div>
 
-            <Card className="mt-8 grid gap-3 border-border bg-card p-5">
+            <div className="mt-8 grid gap-3">
               <Skeleton className="h-7 w-20" />
               {Array.from({ length: 3 }).map((_, index) => (
                 <div key={index} className="flex gap-4">
@@ -223,7 +222,7 @@ export function CustomerFragrance({ slug }: { slug: string }) {
                   <Skeleton className="h-4 w-full" />
                 </div>
               ))}
-            </Card>
+            </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
               {Array.from({ length: 3 }).map((_, index) => (
@@ -333,7 +332,7 @@ export function CustomerFragrance({ slug }: { slug: string }) {
             {item.description}
           </p>
 
-          <Card className="mt-8 grid gap-3 border-border bg-card p-5">
+          <div className="mt-8 grid gap-3">
             <h2 className="font-heading text-2xl font-semibold">Notes</h2>
             {(["top", "heart", "base"] as const).map((level) => (
               <div key={level} className="flex gap-4 text-sm">
@@ -348,7 +347,7 @@ export function CustomerFragrance({ slug }: { slug: string }) {
                 </div>
               </div>
             ))}
-          </Card>
+          </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
             {item.offerings.map((offering) => {
